@@ -684,6 +684,7 @@
       const imgTool = await loadImage(`assets/tools/${data.tool}.png`);
 
       // Layer 1: 天空背景（若無圖則繪製古典漸層底色）
+      ctx.globalCompositeOperation = 'multiply';
       if (imgSky) {
         ctx.drawImage(imgSky, 0, 0, W, H);
       } else {
