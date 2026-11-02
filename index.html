@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>塔羅地景・心靈載具明信片</title>
+  <title>偉特地景・心靈載具校準系統</title>
   <style>
     :root {
       --bg-color: #1a1918;
-      --card-bg: #262422;
+      --card-bg: #242220;
       --text-main: #f5f2eb;
       --accent-gold: #c5a059;
       --border-color: #3d3a36;
+      --cinnabar-red: #8a3324;
+      --text-muted: #a8a29e;
     }
 
     * {
@@ -27,7 +29,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 30px 16px;
+      padding: 30px 16px 60px;
     }
 
     header {
@@ -36,16 +38,16 @@
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.55rem;
       font-weight: 500;
       letter-spacing: 0.15em;
       color: var(--accent-gold);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     p.subtitle {
       font-size: 0.88rem;
-      color: #a8a29e;
+      color: var(--text-muted);
       letter-spacing: 0.05em;
     }
 
@@ -53,23 +55,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 24px;
       width: 100%;
-      max-width: 480px;
+      max-width: 760px;
     }
 
-    /* 畫布容器：維持古典明信片 2:3 豎版比例 */
+    /* 橫版古典明信片 3:2 容器 */
     .canvas-wrapper {
       background-color: #fdf9f0;
       border-radius: 4px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       width: 100%;
-      max-width: 380px;
-      aspect-ratio: 2 / 3;
+      aspect-ratio: 3 / 2;
     }
 
     canvas {
@@ -82,12 +80,11 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      max-width: 380px;
       gap: 12px;
     }
 
     button {
-      padding: 12px 20px;
+      padding: 13px 20px;
       font-size: 0.95rem;
       border: 1px solid var(--accent-gold);
       background: transparent;
@@ -104,8 +101,8 @@
     }
 
     button.btn-primary {
-      background: #8a3324;
-      border-color: #8a3324;
+      background: var(--cinnabar-red);
+      border-color: var(--cinnabar-red);
       color: #fff;
     }
 
@@ -114,24 +111,100 @@
       border-color: #a33e2c;
     }
 
+    button.btn-pay {
+      background: #2b261f;
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      font-weight: 500;
+    }
+
+    button.btn-pay:hover {
+      background: var(--accent-gold);
+      color: #1a1918;
+    }
+
+    /* 300字出廠手冊與分析區塊 */
     .card-info {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      padding: 16px;
+      padding: 24px;
       border-radius: 4px;
       width: 100%;
-      max-width: 380px;
-      font-size: 0.88rem;
-      line-height: 1.6;
-      color: #d6d3cd;
       display: none;
     }
 
-    .card-info h3 {
+    .hd-badge {
+      display: inline-block;
+      border: 1px solid var(--accent-gold);
       color: var(--accent-gold);
-      font-size: 1rem;
-      margin-bottom: 6px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .card-info h2 {
+      font-size: 1.2rem;
+      color: var(--accent-gold);
+      margin-bottom: 14px;
       font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .manual-content {
+      font-size: 0.92rem;
+      line-height: 1.85;
+      color: #d6d3cd;
+      margin-bottom: 24px;
+      text-align: justify;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+    }
+
+    /* 付費買斷與存證區塊 */
+    .payment-section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 18px;
+      border-radius: 4px;
+      border: 1px dashed #4a453e;
+    }
+
+    .invoice-opt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .invoice-opt input {
+      accent-color: var(--accent-gold);
+      cursor: pointer;
+    }
+
+    .invoice-input-box {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .invoice-input-box input {
+      background: #1a1918;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .invoice-input-box input:focus {
+      border-color: var(--accent-gold);
     }
   </style>
 </head>
@@ -139,23 +212,46 @@
 
   <header>
     <h1>偉特地景・載具校準</h1>
-    <p class="subtitle">顯影當下心理景深與立足狀態</p>
+    <p class="subtitle">1909 偉特木刻原畫 × 人類圖決策原型</p>
   </header>
 
   <div class="main-container">
     <div class="canvas-wrapper">
-      <!-- 畫布設定為 800 x 1200 高解析度輸出 -->
-      <canvas id="postcardCanvas" width="800" height="1200"></canvas>
+      <canvas id="postcardCanvas" width="1200" height="800"></canvas>
     </div>
 
     <div class="controls">
       <button class="btn-primary" id="btnDraw" onclick="drawCard()">靜心抽牌・顯影當下風景</button>
-      <button id="btnDownload" style="display: none;" onclick="downloadPostcard()">下載專屬木刻明信片 (PNG)</button>
     </div>
 
     <div class="card-info" id="cardInfo">
-      <h3 id="infoTitle">地景分析</h3>
-      <p id="infoDesc"></p>
+      <span class="hd-badge" id="hdBadge">人類圖原型規格</span>
+      <h2 id="infoTitle">載具出廠定位</h2>
+      
+      <!-- 300字載具出廠手冊心理指引 -->
+      <div class="manual-content" id="manualText"></div>
+
+      <!-- NT$88 微付費買斷與發票存證 -->
+      <div class="payment-section">
+        <label class="invoice-opt">
+          <input type="checkbox" id="chkInvoice" onchange="toggleInvoice()">
+          需要實體手開發票代管存證（免填統編則開立個人收據存證）
+        </label>
+        
+        <div class="invoice-input-box" id="invoiceInputs">
+          <input type="text" id="invTitle" placeholder="買受人抬頭 / 姓名">
+          <input type="text" id="invTaxId" placeholder="統一編號（個人免填）">
+          <input type="email" id="invEmail" placeholder="存證憑據寄送 Email">
+        </div>
+
+        <button class="btn-pay" id="btnPay" onclick="handlePayment()">
+          NT$ 88 微付費買斷・解鎖高解析原印明信片與出廠手冊
+        </button>
+
+        <button id="btnDownload" style="display: none;" onclick="downloadPostcard()">
+          下載專屬高解析木刻明信片 (PNG)
+        </button>
+      </div>
     </div>
   </div>
 
@@ -163,50 +259,46 @@
     const canvas = document.getElementById('postcardCanvas');
     const ctx = canvas.getContext('2d');
 
-    // 模組化圖檔規格與對應設定
     const ASSET_CONFIG = {
       skies: {
-        sky_gold: { name: "暮日晨光", tone: "#f5d77f" },
-        sky_grey: { name: "冷冽長空", tone: "#cfd6df" },
-        sky_night: { name: "深藍子夜", tone: "#1e293b" },
-        sky_storm: { name: "風暴前夕", tone: "#94a3b8" }
+        sky_gold: { name: "暮日晨光", tone: "#f5d77f", hdState: "薦骨動能飽滿 / 處於清晰回應週期" },
+        sky_grey: { name: "冷冽長空", tone: "#cfd6df", hdState: "頭腦中心空白 / 外在資訊雜音過載" },
+        sky_night: { name: "深藍子夜", tone: "#1e293b", hdState: "直覺中心未定義 / 需停步校準安全邊界" },
+        sky_storm: { name: "風暴前夕", tone: "#94a3b8", hdState: "情緒中心週期波動 / 切忌在浪潮頂點做決定" }
       },
       exits: {
-        exit_arch: { name: "雙塔石門" },
-        exit_bridge: { name: "跨谷木橋" },
-        exit_gate: { name: "城邦閘口" },
-        exit_path: { name: "林間小徑" }
+        exit_arch: { name: "雙塔石門", guide: "需等待正式邀請或明晰訊號方可穿越" },
+        exit_bridge: { name: "跨谷木橋", guide: "依靠薦骨單次反應前進，勿向過去回望" },
+        exit_gate: { name: "城邦閘口", guide: "建立明確的物理邊界，停止為他人非自己承擔責任" },
+        exit_path: { name: "林間小徑", guide: "跟隨身體微小牽引，放慢步伐讓路徑自現" }
       },
       grounds: {
-        ground_cliff: { name: "荒蕪峭壁", yOffset: 860 },
-        ground_desert: { name: "蒼茫荒漠", yOffset: 890 },
-        ground_ruin: { name: "殘垣基底", yOffset: 870 },
-        ground_water: { name: "幽暗水岸", yOffset: 910 }
+        ground_cliff: { name: "荒蕪峭壁", yRatio: 0.52, env: "高地懸空，考驗對真實地心引力的信任" },
+        ground_desert: { name: "蒼茫荒漠", yRatio: 0.54, env: "資源單一化，正是關閉干擾、專注核心出廠設定之時" },
+        ground_ruin: { name: "殘垣基底", yRatio: 0.50, env: "舊有防禦機制已碎裂，不必急於重建，席地安坐即可" },
+        ground_water: { name: "幽暗水岸", yRatio: 0.55, env: "情緒水流暗湧，唯有讓體感沉澱方能辨別方向" }
       },
       figures: {
-        figure_guard: { name: "持杖防禦" },
-        figure_sit: { name: "盤坐靜觀" },
-        figure_stand: { name: "佇立凝視" },
-        figure_walk: { name: "啟程涉足" }
+        figure_guard: { name: "持杖防禦", posture: "防線堅固但過度消耗，請確認是在守護能量還是恐懼未知" },
+        figure_sit: { name: "盤坐靜觀", posture: "切斷無效主動出擊，將注意力完全收回體內核心" },
+        figure_stand: { name: "佇立凝視", posture: "載具就位，目光清明，等待外在實相的主動回應" },
+        figure_walk: { name: "啟程涉足", posture: "動能已被喚醒，請以單步為單位確認身體的真實興奮感" }
       },
       tools: {
-        tool_cup: { name: "盈滿聖杯" },
-        tool_pentacle: { name: "地靈星幣" },
-        tool_sword: { name: "破局寶劍" },
-        tool_wand: { name: "權杖生機" }
+        tool_cup: { name: "盈滿聖杯", attr: "情感真實感受" },
+        tool_pentacle: { name: "地靈星幣", attr: "物質與肉身邊界" },
+        tool_sword: { name: "破局寶劍", attr: "明晰判斷與斷捨離" },
+        tool_wand: { name: "權杖生機", attr: "純粹意志與創作動能" }
       }
     };
 
-    // 圖片異步載入與解碼器
     function loadImage(src) {
       return new Promise((resolve) => {
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = src;
 
-        if (img.complete) {
-          return resolve(img);
-        }
+        if (img.complete) return resolve(img);
 
         img.onload = () => {
           if ('decode' in img) {
@@ -217,13 +309,38 @@
         };
 
         img.onerror = () => {
-          console.warn("未找到圖檔，將採用結構化備用色塊：", src);
+          console.warn("未找到圖檔：", src);
           resolve(null);
         };
       });
     }
 
-    // 抽牌核心控制器
+    // 智能去背輔助器：自動將 Canva 圖檔中的接近白色像素 (RGB > 235) 轉為完全透明
+    function createTransparentCanvas(img) {
+      if (!img) return null;
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = img.naturalWidth || img.width;
+      offCanvas.height = img.naturalHeight || img.height;
+      const offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(img, 0, 0);
+
+      try {
+        const imgData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i] > 235 && data[i + 1] > 235 && data[i + 2] > 235) {
+            data[i + 3] = 0;
+          }
+        }
+        offCtx.putImageData(imgData, 0, 0);
+        return offCanvas;
+      } catch (e) {
+        return img;
+      }
+    }
+
+    let currentDrawData = null;
+
     async function drawCard() {
       const btn = document.getElementById('btnDraw');
       btn.disabled = true;
@@ -234,31 +351,29 @@
         return keys[Math.floor(Math.random() * keys.length)];
       };
 
-      const selected = {
+      currentDrawData = {
         sky: pickRandom(ASSET_CONFIG.skies),
         exit: pickRandom(ASSET_CONFIG.exits),
         ground: pickRandom(ASSET_CONFIG.grounds),
         figure: pickRandom(ASSET_CONFIG.figures),
         tool: pickRandom(ASSET_CONFIG.tools),
-        isMirrored: Math.random() > 0.5,
         timestamp: new Date().toISOString()
       };
 
-      await renderLandscape(selected);
-      updateInfoCard(selected);
+      await renderLandscape(currentDrawData);
+      updateInfoCard(currentDrawData);
 
       btn.disabled = false;
       btn.innerText = "重新抽牌・校準地景";
     }
 
-    // Canvas 五層結構化繪製
     async function renderLandscape(data) {
-      const W = canvas.width;
-      const H = canvas.height;
+      const W = canvas.width;  // 1200
+      const H = canvas.height; // 800
 
       ctx.clearRect(0, 0, W, H);
 
-      const [imgSky, imgExit, imgGround, imgFigure, imgTool] = await Promise.all([
+      const [rawSky, rawExit, rawGround, rawFigure, rawTool] = await Promise.all([
         loadImage(`assets/skies/${data.sky}.png`),
         loadImage(`assets/exits/${data.exit}.png`),
         loadImage(`assets/grounds/${data.ground}.png`),
@@ -266,70 +381,89 @@
         loadImage(`assets/tools/${data.tool}.png`)
       ]);
 
-      // 1. 底紙羊皮紙基底與邊界留白
+      const imgSky = rawSky;
+      const imgExit = createTransparentCanvas(rawExit);
+      const imgGround = rawGround;
+      const imgFigure = createTransparentCanvas(rawFigure);
+      const imgTool = createTransparentCanvas(rawTool);
+
+      // 1. 底紙羊皮紙基底與留白
       ctx.fillStyle = "#fdf9f0";
       ctx.fillRect(0, 0, W, H);
 
-      const margin = 36;
+      const margin = 32;
       const innerW = W - margin * 2;
-      const innerH = H - margin * 2 - 40; // 底部留出題字空間
+      const innerH = H - margin * 2 - 36;
 
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip(); // 建立裁切遮罩，防止圖層溢出邊框
+      ctx.clip();
 
-      // 2. 遠景：天空底色（維持明亮通透）
+      // 2. 遠景：天空底色
       ctx.globalCompositeOperation = 'source-over';
       if (imgSky) {
         ctx.drawImage(imgSky, margin, margin, innerW, innerH);
       } else {
-        const skyGrad = ctx.createLinearGradient(0, margin, 0, innerH * 0.75);
+        const skyGrad = ctx.createLinearGradient(0, margin, 0, innerH * 0.7);
         skyGrad.addColorStop(0, ASSET_CONFIG.skies[data.sky].tone);
         skyGrad.addColorStop(1, "#fcf6e8");
         ctx.fillStyle = skyGrad;
         ctx.fillRect(margin, margin, innerW, innerH);
       }
 
-      // 3. 遠景：生路出口（空氣透視感）
+      // 3. 遠景右側：生路出口
       if (imgExit) {
         ctx.save();
-        ctx.globalAlpha = 0.85; // 遠景淡出
+        ctx.globalAlpha = 0.88;
         ctx.globalCompositeOperation = 'multiply';
-        ctx.drawImage(imgExit, margin, margin, innerW, innerH);
+        const exitW = innerW * 0.38;
+        const exitH = innerH * 0.75;
+        const exitX = margin + innerW - exitW - (innerW * 0.04);
+        const exitY = margin + (innerH * 0.12);
+        ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
         ctx.restore();
       }
 
-      // 4. 中景：立足地貌（穩固重心）
+      // 4. 中景：立足地貌（加上頂端漸層羽化）
+      const groundInfo = ASSET_CONFIG.grounds[data.ground];
+      const groundTopY = margin + (innerH * groundInfo.yRatio);
+      const groundH = margin + innerH - groundTopY;
+
       if (imgGround) {
+        const gCanvas = document.createElement('canvas');
+        gCanvas.width = innerW;
+        gCanvas.height = groundH;
+        const gCtx = gCanvas.getContext('2d');
+
+        gCtx.drawImage(imgGround, 0, 0, innerW, groundH);
+
+        gCtx.globalCompositeOperation = 'destination-in';
+        const fadeGrad = gCtx.createLinearGradient(0, 0, 0, groundH * 0.35);
+        fadeGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        fadeGrad.addColorStop(1, 'rgba(0, 0, 0, 1)');
+        gCtx.fillStyle = fadeGrad;
+        gCtx.fillRect(0, 0, innerW, groundH);
+
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
-        ctx.drawImage(imgGround, margin, margin, innerW, innerH);
+        ctx.drawImage(gCanvas, margin, groundTopY, innerW, groundH);
         ctx.restore();
       }
 
-      // 5. 主角：旅人剪影（具備實體遮蔽，背景線條不穿透身體）
-      const groundInfo = ASSET_CONFIG.grounds[data.ground];
-      const figW = innerW * 0.35;
-      const figH = figW * 1.45;
-      const figX = margin + innerW * 0.32;
-      const figY = margin + (groundInfo.yOffset / 1200 * innerH) - figH + 18;
+      // 5. 主角：旅人剪影（位於左側，比例適中）
+      const figW = innerW * 0.18;
+      const figH = figW * 1.5;
+      const figX = margin + (innerW * 0.20);
+      const figY = groundTopY - (figH * 0.65);
 
       ctx.save();
-      if (data.isMirrored) {
-        ctx.translate(figX + figW / 2, 0);
-        ctx.scale(-1, 1);
-        ctx.translate(-(figX + figW / 2), 0);
-      }
-
       if (imgFigure) {
-        // 第一道：以底紙色塗實剪影區域，遮住下層石紋
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         ctx.drawImage(imgFigure, figX, figY, figW, figH);
         ctx.restore();
 
-        // 第二道：以清晰黑墨壓印木刻剪影
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
         ctx.drawImage(imgFigure, figX, figY, figW, figH);
@@ -337,63 +471,92 @@
       }
       ctx.restore();
 
-      // 6. 前景：隨身道具（右下角落款，不再全版遮蔽）
+      // 6. 前景信物：隨身道具（伴隨在旅人右側）
       if (imgTool) {
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
-        const toolW = innerW * 0.36;
-        const toolH = innerH * 0.42;
-        const toolX = margin + innerW - toolW - 12;
-        const toolY = margin + innerH - toolH - 12;
+        const toolW = innerW * 0.10;
+        const toolH = toolW * 1.35;
+        const toolX = figX + figW + (innerW * 0.02);
+        const toolY = figY + (figH * 0.28);
         ctx.drawImage(imgTool, toolX, toolY, toolW, toolH);
         ctx.restore();
       }
 
-      ctx.restore(); // 結束內部繪製裁切
+      ctx.restore();
 
-      // 7. 1909 古典雙層框線
+      // 7. 1909 偉特古典雙層框線
       ctx.strokeStyle = "#2b261f";
       ctx.lineWidth = 3;
-      ctx.strokeRect(margin, margin, innerW, innerH); // 內主框
+      ctx.strokeRect(margin, margin, innerW, innerH);
 
       ctx.lineWidth = 1;
-      ctx.strokeRect(margin - 6, margin - 6, innerW + 12, innerH + 12); // 外細框
+      ctx.strokeRect(margin - 6, margin - 6, innerW + 12, innerH + 12);
 
       // 8. 底部情境銘刻文字
       ctx.fillStyle = "#3e382f";
-      ctx.font = "italic 22px 'Times New Roman', serif";
+      ctx.font = "italic 20px 'Times New Roman', serif";
       ctx.textAlign = "center";
       const sceneTitle = `${ASSET_CONFIG.grounds[data.ground].name} · ${ASSET_CONFIG.skies[data.sky].name}`;
-      ctx.fillText(`— ${sceneTitle} —`, W / 2, H - 22);
-
-      document.getElementById('btnDownload').style.display = "inline-block";
+      ctx.fillText(`— ${sceneTitle} —`, W / 2, H - 18);
     }
 
-    // 更新下方指引文字
+    // 更新 300 字載具出廠手冊心理指引
     function updateInfoCard(data) {
       const card = document.getElementById('cardInfo');
+      const badge = document.getElementById('hdBadge');
       const title = document.getElementById('infoTitle');
-      const desc = document.getElementById('infoDesc');
+      const text = document.getElementById('manualText');
 
-      const skyName = ASSET_CONFIG.skies[data.sky].name;
-      const groundName = ASSET_CONFIG.grounds[data.ground].name;
-      const exitName = ASSET_CONFIG.exits[data.exit].name;
-      const figName = ASSET_CONFIG.figures[data.figure].name;
-      const toolName = ASSET_CONFIG.tools[data.tool].name;
+      const sky = ASSET_CONFIG.skies[data.sky];
+      const ground = ASSET_CONFIG.grounds[data.ground];
+      const exit = ASSET_CONFIG.exits[data.exit];
+      const fig = ASSET_CONFIG.figures[data.figure];
+      const tool = ASSET_CONFIG.tools[data.tool];
 
-      title.innerText = `此時地景：${groundName} × ${skyName}`;
-      desc.innerHTML = `
-        <strong>【空間定位】</strong> 你正立足於「${groundName}」，仰望著「${skyName}」。<br>
-        <strong>【生路與姿態】</strong> 遠方顯現「${exitName}」，而你的載具正以「${figName}」應對當前局勢。<br>
-        <strong>【隨身信物】</strong> 你所配備的資源為「${toolName}」，請以此作為下一步行動與邊界防守的依據。
+      badge.innerText = `載具出廠校準：${sky.hdState.split('/')[0].trim()}`;
+      title.innerText = `地景定位：${ground.name} × ${sky.name}`;
+
+      // 完整 300 字出廠手冊內容
+      text.innerHTML = `
+        <strong>【空間定位與天候狀態】</strong><br>
+        你正置身於「${ground.name}」，頭頂籠罩著「${sky.name}」。${ground.env}。此時載具的運作狀態為：${sky.hdState}。外在環境的壓力並非針對你個人，而是當前場域既有的物理規律，無須動用頭腦過度賦予恐慌或焦慮意義。<br><br>
+        <strong>【姿態校準與生路指引】</strong><br>
+        你的意識形態目前呈現「${fig.name}」的模式：${fig.posture}。請特別留意遠方右側顯現的「${exit.name}」——這代表此時此地唯一的生路出口：${exit.guide}。切記不要用主觀意志試圖強行開闢不存在的路徑，順應地勢才能節省寶貴能量。<br><br>
+        <strong>【隨身法器與邊界防守】</strong><br>
+        你的隨身信物為「${tool.name}」，它代表你此刻最核心的可用資源（${tool.attr}）。在接下來的決策循環中，請將這項工具置於身側，作為守護個人邊界與做出真實回應的錨點。
       `;
+
       card.style.display = "block";
     }
 
-    // 下載明信片 PNG
+    function toggleInvoice() {
+      const chk = document.getElementById('chkInvoice');
+      const inputs = document.getElementById('invoiceInputs');
+      inputs.style.display = chk.checked ? "flex" : "none";
+    }
+
+    // 處理 NT$88 微付費買斷
+    function handlePayment() {
+      const chk = document.getElementById('chkInvoice').checked;
+      let invoiceMsg = "開立個人存證代管收據";
+
+      if (chk) {
+        const title = document.getElementById('invTitle').value.trim();
+        const taxId = document.getElementById('invTaxId').value.trim();
+        const email = document.getElementById('invEmail').value.trim();
+        invoiceMsg = `手開發票存證：抬頭「${title || '個人'}」，統編「${taxId || '無'}」，寄送「${email || '未填寫'}」`;
+      }
+
+      alert(`【微付費買斷確認】\n金額：NT$ 88\n發票代管：${invoiceMsg}\n\n已成功解鎖高解析原印明信片圖檔！`);
+
+      document.getElementById('btnPay').style.display = "none";
+      document.getElementById('btnDownload').style.display = "block";
+    }
+
     function downloadPostcard() {
       const link = document.createElement('a');
-      link.download = `Tarot_Landscape_${Date.now()}.png`;
+      link.download = `Tarot_Postcard_1909_${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     }
