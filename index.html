@@ -123,7 +123,7 @@
       color: #1a1918;
     }
 
-    /* 300字出廠手冊與分析區塊 */
+    /* 300字出廠手冊區塊 */
     .card-info {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -207,7 +207,6 @@
       border-color: var(--accent-gold);
     }
 
-    /* 解鎖後的法器卡片預覽 */
     .unlocked-tool-card {
       display: none;
       background: #1e1d1b;
@@ -263,7 +262,6 @@
       
       <div class="manual-content" id="manualText"></div>
 
-      <!-- NT$88 微付費買斷與隨身法器解鎖 -->
       <div class="payment-section">
         <label class="invoice-opt">
           <input type="checkbox" id="chkInvoice" onchange="toggleInvoice()">
@@ -280,7 +278,6 @@
           NT$ 88 微付費買斷・解鎖高解析原印明信片與專屬隨身信物
         </button>
 
-        <!-- 解鎖後顯示之法器信物 -->
         <div class="unlocked-tool-card" id="toolCard">
           <img id="toolImg" src="" alt="專屬法器">
           <div class="tool-desc">
@@ -314,10 +311,10 @@
         exit_path: { name: "林間小徑", guide: "跟隨身體微小牽引，放慢步伐讓路徑自現" }
       },
       grounds: {
-        ground_cliff: { name: "荒蕪峭壁", yRatio: 0.46, env: "高地懸空，考驗對真實地心引力的信任" },
-        ground_desert: { name: "蒼茫荒漠", yRatio: 0.48, env: "資源單一化，正是關閉干擾、專注核心出廠設定之時" },
-        ground_ruin: { name: "殘垣基底", yRatio: 0.45, env: "舊有防禦機制已碎裂，不必急於重建，席地安坐即可" },
-        ground_water: { name: "幽暗水岸", yRatio: 0.48, env: "情緒水流暗湧，唯有讓體感沉澱方能辨別方向" }
+        ground_cliff: { name: "荒蕪峭壁", baseTone: "#9e9484", env: "高地懸空，考驗對真實地心引力的信任" },
+        ground_desert: { name: "蒼茫荒漠", baseTone: "#c2ab7c", env: "資源單一化，正是關閉干擾、專注核心出廠設定之時" },
+        ground_ruin: { name: "殘垣基底", baseTone: "#8b8377", env: "舊有防禦機制已碎裂，不必急於重建，席地安坐即可" },
+        ground_water: { name: "幽暗水岸", baseTone: "#4b6068", env: "情緒水流暗湧，唯有讓體感沉澱方能辨別方向" }
       },
       figures: {
         figure_guard: { name: "持杖防禦", posture: "防線堅固但過度消耗，請確認是在守護能量還是恐懼未知" },
@@ -356,7 +353,7 @@
       });
     }
 
-    // 智能去白底
+    // 智能像素過濾：徹底清除 Canva 匯出圖檔的白底框 (RGB > 230 轉透明)
     function createTransparentCanvas(img) {
       if (!img) return null;
       const offCanvas = document.createElement('canvas');
@@ -369,7 +366,7 @@
         const imgData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
         const data = imgData.data;
         for (let i = 0; i < data.length; i += 4) {
-          if (data[i] > 235 && data[i + 1] > 235 && data[i + 2] > 235) {
+          if (data[i] > 230 && data[i + 1] > 230 && data[i + 2] > 230) {
             data[i + 3] = 0;
           }
         }
@@ -414,7 +411,7 @@
 
       ctx.clearRect(0, 0, W, H);
 
-      // 只載入風景與旅人四層，道具獨立於風景之外
+      // 風景層平行載入（道具不進畫布，轉移至解鎖專區）
       const [rawSky, rawExit, rawGround, rawFigure] = await Promise.all([
         loadImage(`assets/skies/${data.sky}.png`),
         loadImage(`assets/exits/${data.exit}.png`),
@@ -427,7 +424,7 @@
       const imgGround = rawGround;
       const imgFigure = createTransparentCanvas(rawFigure);
 
-      // 1. 底紙留白與外框
+      // 1. 底紙羊皮紙基底與留白邊界
       ctx.fillStyle = "#fdf9f0";
       ctx.fillRect(0, 0, W, H);
 
@@ -438,14 +435,14 @@
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip();
+      ctx.clip(); // 內框裁切遮罩
 
       // 2. 遠景：天空底色（滿版鋪底）
       ctx.globalCompositeOperation = 'source-over';
       if (imgSky) {
         ctx.drawImage(imgSky, margin, margin, innerW, innerH);
       } else {
-        const skyGrad = ctx.createLinearGradient(0, margin, 0, innerH * 0.7);
+        const skyGrad = ctx.createLinearGradient(0, margin, 0, margin + innerH * 0.7);
         skyGrad.addColorStop(0, ASSET_CONFIG.skies[data.sky].tone);
         skyGrad.addColorStop(1, "#fcf6e8");
         ctx.fillStyle = skyGrad;
@@ -457,19 +454,30 @@
         ctx.save();
         ctx.globalAlpha = 0.82;
         ctx.globalCompositeOperation = 'multiply';
-        const exitW = innerW * 0.28; // 精巧遠景比例
+        const exitW = innerW * 0.28;
         const exitH = innerH * 0.48;
-        const exitX = margin + innerW - exitW - (innerW * 0.08); // 偏右遠處
-        const exitY = margin + (innerH * 0.26);                  // 壓在遠景地平線高度
+        const exitX = margin + innerW - exitW - (innerW * 0.06);
+        const exitY = margin + (innerH * 0.26);
         ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
         ctx.restore();
       }
 
-      // 4. 中景至前景：立足地貌（深層長漸層融合，邊緣完全平滑浸潤至天空）
+      // 4. 中景至近景：立足地貌（強制接地，消除漂浮島問題）
       const groundInfo = ASSET_CONFIG.grounds[data.ground];
-      const groundTopY = margin + (innerH * groundInfo.yRatio);
-      const groundH = margin + innerH - groundTopY;
+      const groundH = innerH * 0.54; // 地貌固定佔下半部 54%
+      const groundTopY = margin + innerH - groundH;
 
+      // 4-1. 大地沉積底層漸層（避免圖檔未滿版時產生空白斷層）
+      ctx.save();
+      const baseGrad = ctx.createLinearGradient(0, groundTopY, 0, margin + innerH);
+      baseGrad.addColorStop(0, "rgba(235, 226, 208, 0)");
+      baseGrad.addColorStop(0.35, "rgba(210, 198, 175, 0.6)");
+      baseGrad.addColorStop(1, groundInfo.baseTone);
+      ctx.fillStyle = baseGrad;
+      ctx.fillRect(margin, groundTopY, innerW, groundH);
+      ctx.restore();
+
+      // 4-2. 繪製地貌圖層（長漸層羽化融入天空）
       if (imgGround) {
         const gCanvas = document.createElement('canvas');
         gCanvas.width = innerW;
@@ -478,12 +486,11 @@
 
         gCtx.drawImage(imgGround, 0, 0, innerW, groundH);
 
-        // 長距離柔和漸層羽化遮罩（55% 高度平滑過渡）
+        // 頂端 40% 平滑羽化過渡
         gCtx.globalCompositeOperation = 'destination-in';
-        const fadeGrad = gCtx.createLinearGradient(0, 0, 0, groundH * 0.55);
-        fadeGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');     // 頂端完全融入天空
-        fadeGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.45)');
-        fadeGrad.addColorStop(1, 'rgba(0, 0, 0, 1)');     // 底部實體線條
+        const fadeGrad = gCtx.createLinearGradient(0, 0, 0, groundH * 0.40);
+        fadeGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        fadeGrad.addColorStop(1, 'rgba(0, 0, 0, 1)');
         gCtx.fillStyle = fadeGrad;
         gCtx.fillRect(0, 0, innerW, groundH);
 
@@ -493,22 +500,22 @@
         ctx.restore();
       }
 
-      // 5. 主角：旅人剪影（穩固座落於畫面左側，腳踏實地）
-      const figW = innerW * 0.16; // 雅致比例
-      const figH = figW * 1.5;
-      const figX = margin + (innerW * 0.18); // 固定在畫面左側
-      // 腳踏在近景地面上，消除懸空漂浮感
-      const figY = margin + innerH - (figH * 1.08);
+      // 5. 主角：旅人剪影（固定在左側 16%，雙腳踩實近景地面）
+      const figH = innerH * 0.36;
+      const figW = figH * 0.68;
+      const figX = margin + (innerW * 0.16);
+      // 腳跟精準切齊畫框下緣，不再漂浮半空
+      const figY = margin + innerH - figH - 14;
 
       ctx.save();
       if (imgFigure) {
-        // 第一層：挖空背景紋理
+        // 第一層：挖空下方地紋，消除穿透
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         ctx.drawImage(imgFigure, figX, figY, figW, figH);
         ctx.restore();
 
-        // 第二層：純黑墨印實體
+        // 第二層：清晰木刻黑墨壓印
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
         ctx.drawImage(imgFigure, figX, figY, figW, figH);
@@ -516,7 +523,7 @@
       }
       ctx.restore();
 
-      ctx.restore(); // 結束裁切
+      ctx.restore(); // 結束內部裁切
 
       // 6. 1909 偉特古典雙層框線
       ctx.strokeStyle = "#2b261f";
@@ -553,12 +560,12 @@
         <strong>【空間定位與天候狀態】</strong><br>
         你正置身於「${ground.name}」，天候映照出「${sky.name}」。${ground.env}。此時載具的運作狀態為：${sky.hdState}。外在環境的壓力並非針對你個人，而是當前場域既有的物理規律，無須動用頭腦過度賦予恐慌意義。<br><br>
         <strong>【姿態校準與遠方生路】</strong><br>
-        你的載具目前安立於左方，呈現「${fig.name}」的模式：${fig.posture}。請凝望右側地平線遠方顯現的「${exit.name}」——這代表此時此地唯一的生路出口：${exit.guide}。由近處立足點望向遠方，無須焦躁疾行，路徑自會由動能帶領展開。<br><br>
+        你的載具目前安立於左方近景，呈現「${fig.name}」的模式：${fig.posture}。請凝望右側地平線遠方顯現的「${exit.name}」——這代表此時此地唯一的生路出口：${exit.guide}。由近處立足點望向遠方，無須焦躁疾行，路徑自會由身體動能帶領展開。<br><br>
         <strong>【隱藏隨身信物】</strong><br>
         你此行配備的核心信物為「${tool.name}」（${tool.attr}）。此信物已收斂至你的載具核心，完成解鎖後可獲取完整法器圖譜與邊界使用指引。
       `;
 
-      // 預設將解鎖區塊還原
+      // 狀態重設
       document.getElementById('toolCard').style.display = "none";
       document.getElementById('btnPay').style.display = "block";
       document.getElementById('btnDownload').style.display = "none";
@@ -585,7 +592,6 @@
 
       alert(`【微付費買斷確認】\n金額：NT$ 88\n發票代管：${invoiceMsg}\n\n已成功解鎖高解析原印明信片與專屬信物卡！`);
 
-      // 解鎖專屬法器卡片
       const tool = ASSET_CONFIG.tools[currentDrawData.tool];
       document.getElementById('toolImg').src = `assets/tools/${currentDrawData.tool}.png`;
       document.getElementById('toolTitle').innerText = `解鎖隨身法器：${tool.name}`;
