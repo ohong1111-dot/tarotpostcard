@@ -34,7 +34,7 @@
 
     header {
       text-align: center;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     h1 {
@@ -55,9 +55,62 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 22px;
+      gap: 20px;
       width: 100%;
       max-width: 780px;
+    }
+
+    /* 人類圖載具規格前置設定選單 */
+    .hd-selector-box {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 16px 20px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hd-selector-box h3 {
+      font-size: 0.95rem;
+      color: var(--accent-gold);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+
+    .hd-fields {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hd-field-group {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .hd-field-group label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hd-field-group select {
+      background: #171615;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 9px 12px;
+      font-size: 0.88rem;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .hd-field-group select:focus {
+      border-color: var(--accent-gold);
     }
 
     /* 橫版古典明信片 3:2 容器 */
@@ -151,7 +204,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* 十卡牌陣展開預覽微縮清單 */
     .celtic-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -268,10 +320,35 @@
 
   <header>
     <h1>偉特地景・載具校準</h1>
-    <p class="subtitle">塞爾特十字 10 卡牌陣 × 20 元素顯影 × 人類圖出廠手冊</p>
+    <p class="subtitle">塞爾特十字 10 卡牌陣 × 個人人類圖原型 × 20 元素顯影</p>
   </header>
 
   <div class="main-container">
+    <!-- 人類圖規格設定欄位 -->
+    <div class="hd-selector-box">
+      <h3>設定個人人類圖載具規格</h3>
+      <div class="hd-fields">
+        <div class="hd-field-group">
+          <label for="selectHdType">載具類型（Type）</label>
+          <select id="selectHdType" onchange="updateAuthorityOptions()">
+            <option value="generator">生產者（Generator）/ 顯生（MG）</option>
+            <option value="projector">投射者（Projector）</option>
+            <option value="manifestor">顯示者（Manifestor）</option>
+            <option value="reflector">反映者（Reflector）</option>
+          </select>
+        </div>
+        <div class="hd-field-group">
+          <label for="selectHdAuth">內在權威（Authority）</label>
+          <select id="selectHdAuth">
+            <option value="sacral">薦骨權威（Sacral）</option>
+            <option value="solar">情緒中心權威（Solar Plexus）</option>
+            <option value="splenic">脾／直覺權威（Splenic）</option>
+            <option value="ego">意志力／心中心權威（Ego）</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <div class="canvas-wrapper">
       <canvas id="postcardCanvas" width="1200" height="800"></canvas>
     </div>
@@ -284,13 +361,10 @@
       <span class="hd-badge" id="hdBadge">HUMAN DESIGN 原型規格</span>
       <h2 id="infoTitle">載具出廠定位</h2>
 
-      <!-- 塞爾特十字十張牌陣映射結果 -->
       <div class="celtic-grid" id="celticGrid"></div>
       
-      <!-- 300字出廠手冊 -->
       <div class="manual-content" id="manualText"></div>
 
-      <!-- NT$88 微付費買斷與法器信物 -->
       <div class="payment-section">
         <label class="invoice-opt">
           <input type="checkbox" id="chkInvoice" onchange="toggleInvoice()">
@@ -326,9 +400,36 @@
     const canvas = document.getElementById('postcardCanvas');
     const ctx = canvas.getContext('2d');
 
-    // 78 張標準偉特牌庫（定義元素與能量傾向）
+    // 人類圖內在權威聯動選單
+    const AUTH_CONFIG = {
+      generator: [
+        { val: "sacral", text: "薦骨權威（Sacral）" },
+        { val: "solar", text: "情緒中心權威（Solar Plexus）" }
+      ],
+      projector: [
+        { val: "solar", text: "情緒中心權威（Solar Plexus）" },
+        { val: "splenic", text: "脾／直覺權威（Splenic）" },
+        { val: "self", text: "自我投射權威（Self-Projected）" },
+        { val: "mental", text: "無內在權威／環境權威（Mental）" }
+      ],
+      manifestor: [
+        { val: "solar", text: "情緒中心權威（Solar Plexus）" },
+        { val: "splenic", text: "脾／直覺權威（Splenic）" },
+        { val: "ego", text: "意志力權威（Ego）" }
+      ],
+      reflector: [
+        { val: "lunar", text: "月亮週期權威（Lunar Cycle）" }
+      ]
+    };
+
+    function updateAuthorityOptions() {
+      const type = document.getElementById('selectHdType').value;
+      const authSelect = document.getElementById('selectHdAuth');
+      authSelect.innerHTML = AUTH_CONFIG[type].map(a => `<option value="${a.val}">${a.text}</option>`).join('');
+    }
+
+    // 78 張標準偉特牌庫
     const TAROT_DECK = [
-      // 大阿爾克那 (22)
       { name: "愚者", elem: "air" }, { name: "魔術師", elem: "air" }, { name: "女祭司", elem: "water" },
       { name: "皇后", elem: "earth" }, { name: "皇帝", elem: "fire" }, { name: "教皇", elem: "earth" },
       { name: "戀人", elem: "air" }, { name: "戰車", elem: "water" }, { name: "力量", elem: "fire" },
@@ -339,7 +440,6 @@
       { name: "世界", elem: "earth" }
     ];
 
-    // 補充小阿爾克那四組牌
     const SUITS = [
       { suit: "權杖", elem: "fire" },
       { suit: "聖杯", elem: "water" },
@@ -353,23 +453,22 @@
       });
     });
 
-    // 20 個木刻風景與信物配置
     const ASSET_CONFIG = {
       skies: {
-        sky_gold: { name: "暮日晨光", tone: "#f5d77f", elem: "fire", hdState: "薦骨動能飽滿 / 處於清晰回應週期" },
-        sky_grey: { name: "冷冽長空", tone: "#cfd6df", elem: "air", hdState: "頭腦中心空白 / 外在資訊雜音過載" },
-        sky_night: { name: "深藍子夜", tone: "#1e293b", elem: "water", hdState: "直覺中心未定義 / 需停步校準安全邊界" },
-        sky_storm: { name: "風暴前夕", tone: "#94a3b8", elem: "earth", hdState: "情緒中心週期波動 / 切忌在浪潮頂點做決定" }
+        sky_gold: { name: "暮日晨光", tone: "#f5d77f", elem: "fire" },
+        sky_grey: { name: "冷冽長空", tone: "#cfd6df", elem: "air" },
+        sky_night: { name: "深藍子夜", tone: "#1e293b", elem: "water" },
+        sky_storm: { name: "風暴前夕", tone: "#94a3b8", elem: "earth" }
       },
       exits: {
-        exit_arch: { name: "雙塔石門", elem: "earth", guide: "需等待正式邀請或明晰訊號方可穿越" },
-        exit_bridge: { name: "跨谷木橋", elem: "fire", guide: "依靠薦骨單次反應前進，勿向過去回望" },
+        exit_arch: { name: "雙塔石門", elem: "earth", guide: "需等待清晰的外在訊號方可穿越" },
+        exit_bridge: { name: "跨谷木橋", elem: "fire", guide: "跨越鴻溝，勿向過去的沈沒成本回望" },
         exit_gate: { name: "城邦閘口", elem: "air", guide: "建立明確的物理邊界，停止為他人非自己承擔責任" },
-        exit_path: { name: "林間小徑", elem: "water", guide: "跟隨身體微小牽引，放慢步伐讓路徑自現" }
+        exit_path: { name: "林間小徑", elem: "water", guide: "放慢步伐讓路徑自現，切忌焦慮加速" }
       },
       grounds: {
         ground_cliff: { name: "荒蕪峭壁", baseTone: "#9e9484", elem: "fire", env: "高地懸空，考驗對真實地心引力的信任" },
-        ground_desert: { name: "蒼茫荒漠", baseTone: "#c2ab7c", elem: "earth", env: "資源單一化，正是關閉干擾、專注核心出廠設定之時" },
+        ground_desert: { name: "蒼茫荒漠", baseTone: "#c2ab7c", elem: "earth", env: "資源單一化，正是關閉外界干擾、回歸核心本質之時" },
         ground_ruin: { name: "殘垣基底", baseTone: "#8b8377", elem: "air", env: "舊有防禦機制已碎裂，不必急於重建，席地安坐即可" },
         ground_water: { name: "幽暗水岸", baseTone: "#4b6068", elem: "water", env: "情緒水流暗湧，唯有讓體感沉澱方能辨別方向" }
       },
@@ -384,41 +483,6 @@
         tool_pentacle: { name: "地靈星幣", elem: "earth", attr: "物質顯化與肉身扎根", guide: "把抽象意念落地為實質產物，專注每一分資源的精確調度。" },
         tool_sword: { name: "破局寶劍", elem: "air", attr: "心智清明與邊界決斷", guide: "斬斷拖泥帶水的無效關係，以理性之刃劃出神聖不可侵犯的界線。" },
         tool_wand: { name: "權杖生機", elem: "fire", attr: "意志萌芽與創造動能", guide: "點燃內在原始的行動渴望，只要興奮感在，方向自會明朗。" }
-      }
-    };
-
-    const HD_MAPPING = {
-      sky_gold: {
-        type: "生產者 / 原型載具",
-        authority: "薦骨權威（Sacral）",
-        strategy: "等待回應（Wait to Respond）",
-        notSelf: "挫折感（Frustration）",
-        centerState: "薦骨中心有定義・動能飽滿",
-        coreGuidance: "你的動力必須由外界刺激觸發，不可用頭腦預設立場強行發起。傾聽身體第一時間的嗯／嗯嗯聲。"
-      },
-      sky_grey: {
-        type: "投射者 / 導航載具",
-        authority: "自我投射 / 心理外在權威",
-        strategy: "等待被正式邀請與賞識",
-        notSelf: "苦澀感（Bitterness）",
-        centerState: "頭腦與邏輯中心開放・接收外界雜訊",
-        coreGuidance: "頭腦中的焦慮並非你的課題，那是周遭環境的思維殘留。切勿試圖回答所有問題，退後一步觀察全局。"
-      },
-      sky_night: {
-        type: "顯示者 / 破局載具",
-        authority: "脾中心直覺權威（Splenic）",
-        strategy: "採取行動前告知相關人等",
-        notSelf: "憤怒感（Anger）",
-        centerState: "直覺中心未定義・警戒安全邊界",
-        coreGuidance: "直覺的聲音只有一次且稍縱即逝。注意身體在幽暗水岸邊的緊繃感，那是不假思索的生存警訊。"
-      },
-      sky_storm: {
-        type: "情緒型生產者 / 浪潮載具",
-        authority: "情緒中心權威（Solar Plexus）",
-        strategy: "等待情緒浪潮平復後再做回應",
-        notSelf: "急躁做決定帶來的悔恨",
-        centerState: "情緒中心強烈波動・週期循環中",
-        coreGuidance: "此刻正在風暴浪潮的尖峰或谷底，當下沒有任何真相。給自己充足時間睡一覺，平靜時答案自明。"
       }
     };
 
@@ -467,13 +531,16 @@
 
     let currentDrawData = null;
 
-    // 塞爾特十字 10 卡核心抽牌與元素加權映射
     async function runCelticCrossSystem() {
       const btn = document.getElementById('btnDraw');
       btn.disabled = true;
-      btn.innerText = "感應洗牌・排定塞爾特十卡中...";
+      btn.innerText = "感應塞爾特十卡中...";
 
-      // 1. 洗牌並抽出 10 張牌
+      // 讀取使用者設定的人類圖載具規格
+      const userType = document.getElementById('selectHdType').value;
+      const userAuth = document.getElementById('selectHdAuth').value;
+
+      // 塞爾特十字 10 張牌
       const shuffled = [...TAROT_DECK].sort(() => 0.5 - Math.random());
       const cCards = shuffled.slice(0, 10);
 
@@ -490,28 +557,24 @@
         { pos: "10. 最終結果", card: cCards[9] }
       ];
 
-      // 2. 映射 20 個元素
-      // 天空：由 第5張(願景) + 第10張(結果) 的主要元素決定
+      // 映射 20 個元素
       const skyElem = cCards[9].elem || cCards[4].elem;
       const skyKey = Object.keys(ASSET_CONFIG.skies).find(k => ASSET_CONFIG.skies[k].elem === skyElem) || "sky_gold";
 
-      // 出口：由 第4張(潛意識) + 第6張(未來) 決定
       const exitElem = cCards[5].elem || cCards[3].elem;
       const exitKey = Object.keys(ASSET_CONFIG.exits).find(k => ASSET_CONFIG.exits[k].elem === exitElem) || "exit_gate";
 
-      // 地貌：由 第1張(現狀) + 第2張(阻礙) + 第8張(環境) 決定
       const groundElem = cCards[1].elem || cCards[7].elem || cCards[0].elem;
       const groundKey = Object.keys(ASSET_CONFIG.grounds).find(k => ASSET_CONFIG.grounds[k].elem === groundElem) || "ground_desert";
 
-      // 旅人姿態：由 第7張(自我姿態) + 第9張(希望與恐懼) 決定
       const figElem = cCards[6].elem || cCards[8].elem;
       const figKey = Object.keys(ASSET_CONFIG.figures).find(k => ASSET_CONFIG.figures[k].elem === figElem) || "figure_stand";
 
-      // 隨身信物：由 第3張(核心意識焦點) 決定，作為付費解鎖法器
       const toolElem = cCards[2].elem;
       const toolKey = Object.keys(ASSET_CONFIG.tools).find(k => ASSET_CONFIG.tools[k].elem === toolElem) || "tool_wand";
 
       currentDrawData = {
+        userHd: { type: userType, auth: userAuth },
         celtic: celticPositions,
         sky: skyKey,
         exit: exitKey,
@@ -521,17 +584,13 @@
         timestamp: new Date().toISOString()
       };
 
-      // 3. 繪製明信片
       await renderLandscape(currentDrawData);
-
-      // 4. 生成下方報告與牌陣資訊
       updateInfoCard(currentDrawData);
 
       btn.disabled = false;
       btn.innerText = "重新感應十卡・校準地景";
     }
 
-    // 橫版明信片渲染引擎
     async function renderLandscape(data) {
       const W = canvas.width;  // 1200
       const H = canvas.height; // 800
@@ -561,9 +620,9 @@
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip(); // 建立邊界遮罩
+      ctx.clip();
 
-      // 2. 遠景：天空底色（全版鋪滿內框）
+      // 2. 遠景：天空底色
       ctx.globalCompositeOperation = 'source-over';
       if (imgSky) {
         ctx.drawImage(imgSky, margin, margin, innerW, innerH);
@@ -575,7 +634,7 @@
         ctx.fillRect(margin, margin, innerW, innerH);
       }
 
-      // 3. 遠方生路出口（微縮遠景，座落右側遠方地平線，創造深遠空間感）
+      // 3. 遠方生路出口（微縮遠景，座落右側遠方地平線）
       if (imgExit) {
         ctx.save();
         ctx.globalAlpha = 0.82;
@@ -588,12 +647,11 @@
         ctx.restore();
       }
 
-      // 4. 中景至近景：立足地貌（強制接地，消除懸空）
+      // 4. 中景至近景：立足地貌（強制接地，消除漂浮島問題）
       const groundInfo = ASSET_CONFIG.grounds[data.ground];
       const groundH = innerH * 0.54;
       const groundTopY = margin + innerH - groundH;
 
-      // 4-1. 大地沉積底層漸層（避免圖檔未滿版時露出白底）
       ctx.save();
       const baseGrad = ctx.createLinearGradient(0, groundTopY, 0, margin + innerH);
       baseGrad.addColorStop(0, "rgba(235, 226, 208, 0)");
@@ -603,7 +661,6 @@
       ctx.fillRect(margin, groundTopY, innerW, groundH);
       ctx.restore();
 
-      // 4-2. 繪製地貌圖層（長漸層羽化融入天空）
       if (imgGround) {
         const gCanvas = document.createElement('canvas');
         gCanvas.width = innerW;
@@ -612,7 +669,6 @@
 
         gCtx.drawImage(imgGround, 0, 0, innerW, groundH);
 
-        // 頂端 40% 平滑過渡
         gCtx.globalCompositeOperation = 'destination-in';
         const fadeGrad = gCtx.createLinearGradient(0, 0, 0, groundH * 0.40);
         fadeGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
@@ -634,13 +690,11 @@
 
       ctx.save();
       if (imgFigure) {
-        // 第一層：挖空下方地紋，消除穿透
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         ctx.drawImage(imgFigure, figX, figY, figW, figH);
         ctx.restore();
 
-        // 第二層：清晰木刻黑墨壓印
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
         ctx.drawImage(imgFigure, figX, figY, figW, figH);
@@ -666,7 +720,7 @@
       ctx.fillText(`— ${sceneTitle} —`, W / 2, H - 18);
     }
 
-    // 生成塞爾特十字 10 卡與 300 字人類圖報告
+    // 生成結合「使用者設定的人類圖規格」與「塞爾特十卡」的 300 字深度報告
     function updateInfoCard(data) {
       const card = document.getElementById('cardInfo');
       const badge = document.getElementById('hdBadge');
@@ -679,9 +733,49 @@
       const exit = ASSET_CONFIG.exits[data.exit];
       const fig = ASSET_CONFIG.figures[data.figure];
       const tool = ASSET_CONFIG.tools[data.tool];
-      const hd = HD_MAPPING[data.sky];
 
-      badge.innerText = `HUMAN DESIGN 原型規格：${hd.type}`;
+      // 人類圖決策矩陣指引
+      const HD_SPECS = {
+        generator: {
+          name: "生產者 / 原型載具",
+          strategy: "等待回應（Wait to Respond）",
+          notSelf: "挫折感（Frustration）",
+          rule: "切勿用頭腦主動發起。專注眼前外界給予的刺激，傾聽薦骨發出的真實動能。"
+        },
+        projector: {
+          name: "投射者 / 導航載具",
+          strategy: "等待被正式邀請與賞識",
+          notSelf: "苦澀感（Bitterness）",
+          rule: "停止主動推銷自己的見解。唯有在對方真正開口邀請時，你的指引才能被看見並發揮價值。"
+        },
+        manifestor: {
+          name: "顯示者 / 破局載具",
+          strategy: "採取行動前主動告知",
+          notSelf: "憤怒感（Anger）",
+          rule: "你的天命在於開啟新局。但在行動踩下油門前，必須先告知受影響的周遭，以掃除阻力。"
+        },
+        reflector: {
+          name: "反映者 / 鏡面載具",
+          strategy: "歷經一個完整月亮週期再做重大決策",
+          notSelf: "失望感（Disappointment）",
+          rule: "你是環境的清澈鏡子。給予自己足夠的時間沈澱，不吸收任何外在的焦慮雜訊。"
+        }
+      };
+
+      const AUTH_SPECS = {
+        sacral: "薦骨權威（當下第一時間的身體嗯／嗯嗯聲）",
+        solar: "情緒中心權威（情緒浪潮中沒有當下的真相，需等待週期平復）",
+        splenic: "脾中心權威（當下的直覺警訊只有一次，需立即信賴）",
+        ego: "意志力權威（向內確認『我真心承諾、我說到做到』的驅動力）",
+        self: "自我投射權威（透過向信賴的朋友傾訴，聽見自己說出的真心話）",
+        mental: "環境／無內在權威（需處於正確且舒適的物理空間中進行思考）",
+        lunar: "月亮週期權威（跟隨 28 天行運逐步看清全貌）"
+      };
+
+      const userSpec = HD_SPECS[data.userHd.type];
+      const userAuthDesc = AUTH_SPECS[data.userHd.auth];
+
+      badge.innerText = `YOUR SPEC：${userSpec.name}`;
       title.innerText = `出廠地景定位：${ground.name} × ${sky.name}`;
 
       // 列出 10 張牌微縮資訊
@@ -695,21 +789,21 @@
       // 300字深度出廠手冊
       text.innerHTML = `
         <div style="background: rgba(0,0,0,0.3); border-left: 3px solid var(--accent-gold); padding: 12px 14px; margin-bottom: 18px; font-size: 0.85rem; line-height: 1.6;">
-          <strong style="color: var(--accent-gold);">【載具出廠規格參數】</strong><br>
-          ・內在權威：${hd.authority}<br>
-          ・人生策略：${hd.strategy}<br>
-          ・當前能量中心：${hd.centerState}<br>
-          ・非自己警訊：${hd.notSelf}
+          <strong style="color: var(--accent-gold);">【你的專屬出廠規格】</strong><br>
+          ・載具類型：${userSpec.name}<br>
+          ・決策權威：${userAuthDesc}<br>
+          ・人生策略：${userSpec.strategy}<br>
+          ・非自己警訊：${userSpec.notSelf}
         </div>
 
         <strong>【空間定位與天候狀態】</strong><br>
-        依據牌陣第 1、2、8 張牌所聚合之實相，你正立足於「${ground.name}」，天候呈現「${sky.name}」。${ground.env}。此時載具處於：${sky.hdState}。外在環境的壓力是當前場域既有的物理規律，無須動用頭腦過度賦予恐慌意義。<br><br>
+        依據牌陣第 1、2、8 張牌聚合之實相，你的肉身載具正立足於「${ground.name}」，天候映照出「${sky.name}」。${ground.env}。外在場域的壓力並非針對你個人，而是既有的客觀法則。<br><br>
 
-        <strong>【姿態校準與遠方生路】</strong><br>
-        由第 7、9 張牌映射，你的載具安立於左方近景，呈現「${fig.name}」的模式：${fig.posture}。第 4、6 張牌則為你指引出右側遠方的「${exit.name}」——這代表此時此地唯一的生路出口：${exit.guide}。由近處立足點望向遠方，無須焦躁疾行，路徑自會由身體動能帶領展開。<br><br>
+        <strong>【出廠校準與遠方生路】</strong><br>
+        請依循你的出廠準則：${userSpec.rule} 目前第 7、9 張牌顯示你以「${fig.name}」模式面對：${fig.posture}。而第 4、6 張牌所指引的唯一生路，是右側地平線遠方的「${exit.name}」——${exit.guide}。由近處立足點望向遠方，切莫焦躁發起，讓正確權威引領步伐。<br><br>
 
         <strong>【隱藏隨身信物】</strong><br>
-        源於第 3 張意識焦點牌，你此行配備的核心信物為「${tool.name}」（${tool.attr}）。此信物已收斂至你的載具核心，完成解鎖後可獲取完整法器圖譜與邊界使用指引。
+        源於第 3 張意識焦點牌，你此行配備的核心資源為「${tool.name}」（${tool.attr}）。此信物已收斂至你的載具核心，完成解鎖後可獲取完整法器圖譜與邊界使用指引。
       `;
 
       document.getElementById('toolCard').style.display = "none";
