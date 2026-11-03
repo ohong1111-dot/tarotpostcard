@@ -589,6 +589,9 @@
     // ----------------------------------------------------
     // 透視校準 + 自動去白底 + 地貌沉降 + 人物出口定錨渲染引擎
     // ----------------------------------------------------
+    // ----------------------------------------------------
+    // 三遠法透視：Ground 2/3 + Exit 1/3 共線景深渲染引擎
+    // ----------------------------------------------------
     async function renderLandscape(data) {
       const W = canvas.width;  // 1200
       const H = canvas.height; // 800
@@ -632,7 +635,10 @@
         ctx.fillRect(margin, margin, innerW, innerH);
       }
 
-      // 版 2：立足地貌版（沉降至下半部 52%，讓天空星月大面積顯現）
+      // 共同地平基準高度（全景下半部 68% 處）
+      const sharedHorizonY = margin + (innerH * 0.72);
+
+      // 版 2：立足地貌版（沉降下半部，為右側出口預留銜接平台）
       if (imgGround) {
         ctx.save();
         ctx.globalCompositeOperation = 'source-over';
@@ -642,22 +648,42 @@
         ctx.restore();
       }
 
-      // 版 3：遠方生路出口版（靠右至 74% 處，基底嵌合於地貌稜線上產生延伸感）
+      // 版 3：遠方生路出口版（佔右側 1/3 寬度，底部精準咬死在共同水平線上，帶景深遠霧）
       if (imgExit) {
         ctx.save();
-        ctx.globalCompositeOperation = 'source-over';
-        const exitAspect = (imgExit.width / imgExit.height) || 1.1;
-        const exitW = innerW * 0.24;
+        
+        // 寬度佔右側約 30%~33%（即 1/3 視覺比例）
+        const exitAspect = (imgExit.width / imgExit.height) || 1.2;
+        const exitW = innerW * 0.32;
         const exitH = exitW / exitAspect;
-        
-        const exitX = margin + (innerW * 0.74);
-        const exitY = margin + (innerH * 0.76) - exitH;
-        
+
+        // X 定位在右側 68% 起始處，延伸至右畫框
+        const exitX = margin + (innerW * 0.68);
+        // Y 底部嚴格切齊 sharedHorizonY（大地收尾水平線）
+        const exitY = sharedHorizonY - exitH + 8; // 稍微下沉 8px 與大地稜線重合咬死
+
+        // 景深效果 1：空氣遠近透視（微降不透明度，讓天空色調滲透進來）
+        ctx.globalAlpha = 0.92;
+        ctx.globalCompositeOperation = 'source-over';
+
+        // 景深效果 2：地平線接觸邊界微光融合（去除貼紙銳利硬邊）
+        ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetY = 4;
+
         ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
+
+        // 景深效果 3：遠景薄霧微染（Atmospheric Haze）
+        const hazeGrad = ctx.createLinearGradient(exitX, exitY, exitX, sharedHorizonY);
+        hazeGrad.addColorStop(0, "transparent");
+        hazeGrad.addColorStop(1, "rgba(253, 249, 240, 0.18)"); // 與底紙色調微融
+        ctx.fillStyle = hazeGrad;
+        ctx.fillRect(exitX, exitY, exitW, exitH);
+
         ctx.restore();
       }
 
-      // 版 4：旅人姿態黑線版（定錨於左下近景平台 8% 處，腳踩下緣 90%）
+      // 版 4：旅人姿態黑線版（定錨於左側 8% 處，腳踩近景 90%）
       if (imgFigure) {
         ctx.save();
         ctx.globalCompositeOperation = 'source-over';
@@ -691,7 +717,6 @@
       const sceneTitle = `${ASSET_CONFIG.grounds[data.ground].name} · ${ASSET_CONFIG.skies[data.sky].name}`;
       ctx.fillText(`— ${sceneTitle} —`, W / 2, H - 18);
     }
-
     function updateInfoCard(data) {
       const card = document.getElementById('cardInfo');
       const badge = document.getElementById('hdBadge');
