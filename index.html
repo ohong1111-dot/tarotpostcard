@@ -326,36 +326,46 @@
       // 1. 天空
       if (imgSky) ctx.drawImage(imgSky, margin, margin, innerW, innerH);
 
-     // ----------------------------------------------------
-      // 2 & 3. 地貌與出口（依透視自動切換前後圖層）
+// ----------------------------------------------------
+      // 2 & 3. 地貌與出口（依地貌類型動態校準透視）
       // ----------------------------------------------------
       const isSeaExit = (exit === 'exit_sea');
+      const isWaterGround = (ground === 'ground_water');
 
       // 繪製生路出口函式
       const drawExit = () => {
         if (!imgExit) return;
         ctx.save();
         const exitAspect = (imgExit.width / imgExit.height) || 1.2;
-        // 如果是海面，寬度自動放到 42% 以上在右後方鋪開
-        const exitW = innerW * (isSeaExit ? Math.max(exitWRatio, 0.42) : exitWRatio);
-        const exitH = exitW / exitAspect;
-        const exitX = margin + (innerW * (isSeaExit ? Math.min(exitXRatio, 0.60) : exitXRatio));
-        const exitY = margin + (innerH * exitYRatio) - exitH;
 
-        const pivotX = exitX + exitW / 2;
-        const pivotY = exitY + exitH;
-        ctx.translate(pivotX, pivotY);
-        ctx.rotate((exitRotDeg * Math.PI) / 180);
-        ctx.translate(-pivotX, -pivotY);
+        let exitW, exitX, exitY;
 
-        ctx.globalAlpha = 0.96;
-        ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
+        if (isSeaExit && isWaterGround) {
+          // 當水岸遇到出海口：縮小至遠景比例，底部嚴格貼齊水岸遠山地平線 (約 63% 高度)
+          exitW = innerW * Math.min(exitWRatio, 0.22);
+          const exitH = exitW / exitAspect;
+          exitX = margin + (innerW * Math.max(exitXRatio, 0.76));
+          exitY = margin + (innerH * 0.635) - exitH;
+          
+          ctx.globalAlpha = 0.88; // 遠景薄霧微透
+          ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
+        } else {
+          // 一般情況或草坡/岩壁遮擋情況
+          exitW = innerW * (isSeaExit ? Math.max(exitWRatio, 0.40) : exitWRatio);
+          const exitH = exitW / exitAspect;
+          exitX = margin + (innerW * (isSeaExit ? Math.min(exitXRatio, 0.62) : exitXRatio));
+          exitY = margin + (innerH * exitYRatio) - exitH;
 
-        const hazeGrad = ctx.createLinearGradient(exitX, exitY, exitX, exitY + exitH);
-        hazeGrad.addColorStop(0, "transparent");
-        hazeGrad.addColorStop(1, "rgba(253, 249, 240, 0.12)");
-        ctx.fillStyle = hazeGrad;
-        ctx.fillRect(exitX, exitY, exitW, exitH);
+          const pivotX = exitX + exitW / 2;
+          const pivotY = exitY + exitH;
+          ctx.translate(pivotX, pivotY);
+          ctx.rotate((exitRotDeg * Math.PI) / 180);
+          ctx.translate(-pivotX, -pivotY);
+
+          ctx.globalAlpha = 0.96;
+          ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
+        }
+
         ctx.restore();
       };
 
@@ -370,8 +380,8 @@
         ctx.restore();
       };
 
-      // 依透視決定圖層先後：海面退到山丘背後，建築/橋樑立於大地之上
-      if (isSeaExit) {
+      // 依透視排定圖層：草坡/岩壁時海在後；水岸時地貌在前或後皆讓微縮礁石嵌在遠方山水線上
+      if (isSeaExit && !isWaterGround) {
         drawExit();
         drawGround();
       } else {
