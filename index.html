@@ -448,7 +448,7 @@
       });
     });
 
-    // 嚴格對應硬碟內的 20 個真實檔案
+    // 嚴格對應硬碟內的 20 個真實檔案[cite: 11, 12, 13, 14, 15]
     const ASSET_CONFIG = {
       skies: {
         sky_gold: { name: "暮日晨光", tone: "#f5d77f", elem: "fire" },
@@ -561,7 +561,9 @@
       btn.innerText = "重新感應十卡・校準地景";
     }
 
-    // 套版印刷標準版印引擎（1200x800 原點零誤差疊印）
+    // ----------------------------------------------------
+    // 透視校準版印渲染引擎
+    // ----------------------------------------------------
     async function renderLandscape(data) {
       const W = canvas.width;  // 1200
       const H = canvas.height; // 800
@@ -600,27 +602,54 @@
         ctx.fillRect(margin, margin, innerW, innerH);
       }
 
-      // 版 2：立足地貌版（套印基底）
+      // 版 2：立足地貌版（壓低高度，保留上方開闊天空）
       if (imgGround) {
         ctx.save();
-        ctx.globalCompositeOperation = 'multiply';
-        ctx.drawImage(imgGround, margin, margin, innerW, innerH);
+        ctx.globalCompositeOperation = 'source-over';
+        
+        // 將地貌下壓：只覆蓋畫面下半部 48% 的高度
+        const gH = innerH * 0.48;
+        const gY = margin + innerH - gH;
+
+        // 如果圖檔高度較大，取其下半部繪製，避免頂端過高遮擋天空
+        ctx.drawImage(imgGround, margin, gY, innerW, gH);
         ctx.restore();
       }
 
-      // 版 3：遠方生路出口版（套印右後方出路）
+      // 版 3：遠方生路出口版（微縮遠景，座落於地平線上）
       if (imgExit) {
         ctx.save();
-        ctx.globalCompositeOperation = 'multiply';
-        ctx.drawImage(imgExit, margin, margin, innerW, innerH);
+        ctx.globalCompositeOperation = 'source-over';
+        
+        // 寬度縮小至 25%~28%，呈現遠方出口感
+        const exitAspect = (imgExit.width / imgExit.height) || 1.1;
+        const exitW = innerW * 0.26;
+        const exitH = exitW / exitAspect;
+        
+        // 定位在右側（X = 68% 處），底部貼齊中景地貌
+        const exitX = margin + (innerW * 0.68);
+        const exitY = margin + (innerH * 0.72) - exitH;
+        
+        ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
         ctx.restore();
       }
 
-      // 版 4：旅人姿態黑線版（套印左側主角）
+      // 版 4：旅人姿態黑線版（微縮古典比例，踏在左側近景）
       if (imgFigure) {
         ctx.save();
-        ctx.globalCompositeOperation = 'multiply';
-        ctx.drawImage(imgFigure, margin, margin, innerW, innerH);
+        ctx.globalCompositeOperation = 'source-over';
+
+        // 依姿態調整高度：站姿走姿佔 38%，坐姿佔 28%
+        const isSit = data.figure.includes('sit');
+        const figH = isSit ? innerH * 0.28 : innerH * 0.38;
+        const figAspect = (imgFigure.width / imgFigure.height) || 0.6;
+        const figW = figH * figAspect;
+
+        // 定位在左側近景（X = 14% 處），腳踏在 82% 處的堅實地面
+        const figX = margin + (innerW * 0.14);
+        const figY = margin + (innerH * 0.82) - figH;
+
+        ctx.drawImage(imgFigure, figX, figY, figW, figH);
         ctx.restore();
       }
 
