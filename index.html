@@ -326,29 +326,24 @@
       // 1. 天空
       if (imgSky) ctx.drawImage(imgSky, margin, margin, innerW, innerH);
 
-      // 2. 地貌（可縮寬度留出右側生路空間）
-      if (imgGround) {
-        ctx.save();
-        const gW = innerW * groundWRatio;
-        const gH = innerH * groundHRatio;
-        const gY = margin + innerH - gH;
-        ctx.drawImage(imgGround, margin, gY, gW, gH);
-        ctx.restore();
-      }
+     // ----------------------------------------------------
+      // 2 & 3. 地貌與出口（依透視自動切換前後圖層）
+      // ----------------------------------------------------
+      const isSeaExit = (exit === 'exit_sea');
 
-      // 3. 出口（支援以底座為軸心的旋轉角度與透視）
-      if (imgExit) {
+      // 繪製生路出口函式
+      const drawExit = () => {
+        if (!imgExit) return;
         ctx.save();
         const exitAspect = (imgExit.width / imgExit.height) || 1.2;
-        const exitW = innerW * exitWRatio;
+        // 如果是海面，寬度自動放到 42% 以上在右後方鋪開
+        const exitW = innerW * (isSeaExit ? Math.max(exitWRatio, 0.42) : exitWRatio);
         const exitH = exitW / exitAspect;
-        const exitX = margin + (innerW * exitXRatio);
+        const exitX = margin + (innerW * (isSeaExit ? Math.min(exitXRatio, 0.60) : exitXRatio));
         const exitY = margin + (innerH * exitYRatio) - exitH;
 
-        // 以出口底部中心為旋轉支點
         const pivotX = exitX + exitW / 2;
         const pivotY = exitY + exitH;
-
         ctx.translate(pivotX, pivotY);
         ctx.rotate((exitRotDeg * Math.PI) / 180);
         ctx.translate(-pivotX, -pivotY);
@@ -356,16 +351,33 @@
         ctx.globalAlpha = 0.96;
         ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
 
-        // 遠景薄霧微染
         const hazeGrad = ctx.createLinearGradient(exitX, exitY, exitX, exitY + exitH);
         hazeGrad.addColorStop(0, "transparent");
         hazeGrad.addColorStop(1, "rgba(253, 249, 240, 0.12)");
         ctx.fillStyle = hazeGrad;
         ctx.fillRect(exitX, exitY, exitW, exitH);
-
         ctx.restore();
-      }
+      };
 
+      // 繪製地貌函式
+      const drawGround = () => {
+        if (!imgGround) return;
+        ctx.save();
+        const gW = innerW * groundWRatio;
+        const gH = innerH * groundHRatio;
+        const gY = margin + innerH - gH;
+        ctx.drawImage(imgGround, margin, gY, gW, gH);
+        ctx.restore();
+      };
+
+      // 依透視決定圖層先後：海面退到山丘背後，建築/橋樑立於大地之上
+      if (isSeaExit) {
+        drawExit();
+        drawGround();
+      } else {
+        drawGround();
+        drawExit();
+      }
       // 4. 人物
       if (imgFigure) {
         ctx.save();
