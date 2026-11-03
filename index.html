@@ -60,7 +60,6 @@
       max-width: 780px;
     }
 
-    /* 人類圖載具規格前置選單 */
     .hd-selector-box {
       width: 100%;
       background: var(--card-bg);
@@ -113,7 +112,6 @@
       border-color: var(--accent-gold);
     }
 
-    /* 橫版古典明信片 3:2 容器 */
     .canvas-wrapper {
       background-color: #fdf9f0;
       border-radius: 4px;
@@ -176,7 +174,6 @@
       color: #171615;
     }
 
-    /* 塞爾特十卡與300字手冊區塊 */
     .card-info {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -237,7 +234,6 @@
       padding-bottom: 20px;
     }
 
-    /* 付費買斷與信物解鎖區塊 */
     .payment-section {
       display: flex;
       flex-direction: column;
@@ -448,7 +444,6 @@
       });
     });
 
-    // 嚴格對齊硬碟 20 個真實圖檔名稱
     const ASSET_CONFIG = {
       skies: {
         sky_gold: { name: "暮日晨光", tone: "#f5d77f", elem: "fire" },
@@ -502,7 +497,6 @@
       });
     }
 
-    // 自動去除白色背景圖塊，避免出現白色長方形遮擋
     function createTransparentCanvas(img) {
       if (!img) return null;
       const offCanvas = document.createElement('canvas');
@@ -515,7 +509,6 @@
         const imgData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
         const data = imgData.data;
         for (let i = 0; i < data.length; i += 4) {
-          // 若為近白色背景（RGB 皆 > 220），將透明度設為 0
           if (data[i] > 220 && data[i + 1] > 220 && data[i + 2] > 220) {
             data[i + 3] = 0;
           }
@@ -587,13 +580,7 @@
     }
 
     // ----------------------------------------------------
-    // 透視校準 + 自動去白底 + 地貌沉降 + 人物出口定錨渲染引擎
-    // ----------------------------------------------------
-    // ----------------------------------------------------
-    // 三遠法透視：Ground 2/3 + Exit 1/3 共線景深渲染引擎
-    // ----------------------------------------------------
-   // ----------------------------------------------------
-    // 三遠法動態咬合：地貌專屬地平線 + Exit 1/3 景深渲染引擎
+    // 三遠法：Ground 2/3 + Exit 1/3 地形接續渲染引擎
     // ----------------------------------------------------
     async function renderLandscape(data) {
       const W = canvas.width;  // 1200
@@ -648,52 +635,57 @@
         ctx.restore();
       }
 
-      // 四大地貌的專屬右側銜接基準高度（比例）
-      const GROUND_ANCHOR_MAP = {
-        ground_hill: 0.78,     // 草坡右側走低，出口下沉至 78% 踏地
-        ground_cliff: 0.70,    // 峭壁右側稜線在 70%
-        ground_terrace: 0.72,  // 石階平台在 72%
-        ground_water: 0.62     // 水岸遠山交界在 62%
-      };
-      const currentAnchorRatio = GROUND_ANCHOR_MAP[data.ground] || 0.72;
-      const groundHorizonY = margin + (innerH * currentAnchorRatio);
-
-      // 版 3：遠方生路出口版（佔右側 1/3，底部動態嵌合在專屬地平線上）
+      // 版 3：遠方生路出口版（精確對齊各類地貌收尾線，絕不懸空）
       if (imgExit) {
         ctx.save();
+        ctx.globalCompositeOperation = 'source-over';
         
-        // 寬度佔右側約 30%~32%
+        // 寬度擴展至 34%（佔畫面右側約 1/3）
         const exitAspect = (imgExit.width / imgExit.height) || 1.2;
-        const exitW = innerW * 0.30;
+        const exitW = innerW * 0.34;
         const exitH = exitW / exitAspect;
 
-        // X 定位在右側 69% 處延伸至右邊緣
-        const exitX = margin + (innerW * 0.69);
-        // Y 精準依據地貌專屬高度咬死
-        const exitY = groundHorizonY - exitH + 6;
+        // X 緊貼右邊緣（從 66% 延伸至 100% 邊界）
+        const exitX = margin + (innerW * 0.66);
 
-        // 景深透視 1：微調不透明度讓環境色滲透
-        ctx.globalAlpha = 0.94;
-        ctx.globalCompositeOperation = 'source-over';
+        // 核心修正：依照「地貌 + 出口類型」精算絕對接續底部
+        let targetBottomY = margin + (innerH * 0.72); // 預設
 
-        // 景深透視 2：地平線基底柔和陰影
-        ctx.shadowColor = "rgba(0, 0, 0, 0.28)";
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetY = 4;
+        if (data.ground === 'ground_hill') {
+          // 草坡一路向右下方傾斜：出海口與小徑直接貼死右下角地底，門與橋踏在草地上
+          if (data.exit === 'exit_sea' || data.exit === 'exit_path') {
+            targetBottomY = margin + (innerH * 0.96); // 深度貼地，徹底消除浮空！
+          } else {
+            targetBottomY = margin + (innerH * 0.88); // 雙塔/木橋立在草坡右側
+          }
+        } else if (data.ground === 'ground_cliff') {
+          // 懸崖右側稜線在 74%
+          targetBottomY = (data.exit === 'exit_sea') ? margin + (innerH * 0.90) : margin + (innerH * 0.74);
+        } else if (data.ground === 'ground_terrace') {
+          // 石階平台右側邊緣在 76%
+          targetBottomY = margin + (innerH * 0.76);
+        } else if (data.ground === 'ground_water') {
+          // 水岸遠山水平線在 64%
+          targetBottomY = margin + (innerH * 0.64);
+        }
 
+        const exitY = targetBottomY - exitH;
+
+        // 景深效果：透光融合 + 地表輕柔陰影
+        ctx.globalAlpha = 0.96;
         ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
 
-        // 景深透視 3：遠景薄霧微染，加深景深層次
-        const hazeGrad = ctx.createLinearGradient(exitX, exitY, exitX, groundHorizonY);
+        // 遠景薄霧微染
+        const hazeGrad = ctx.createLinearGradient(exitX, exitY, exitX, targetBottomY);
         hazeGrad.addColorStop(0, "transparent");
-        hazeGrad.addColorStop(1, "rgba(253, 249, 240, 0.16)");
+        hazeGrad.addColorStop(1, "rgba(253, 249, 240, 0.12)");
         ctx.fillStyle = hazeGrad;
         ctx.fillRect(exitX, exitY, exitW, exitH);
 
         ctx.restore();
       }
 
-      // 版 4：旅人姿態黑線版（定錨於左下近景 8% 處，腳踩下緣 90%）
+      // 版 4：旅人姿態黑線版（定錨於左下近景平台 8% 處，腳踩下緣 90%）
       if (imgFigure) {
         ctx.save();
         ctx.globalCompositeOperation = 'source-over';
@@ -727,6 +719,7 @@
       const sceneTitle = `${ASSET_CONFIG.grounds[data.ground].name} · ${ASSET_CONFIG.skies[data.sky].name}`;
       ctx.fillText(`— ${sceneTitle} —`, W / 2, H - 18);
     }
+
     function updateInfoCard(data) {
       const card = document.getElementById('cardInfo');
       const badge = document.getElementById('hdBadge');
@@ -770,7 +763,7 @@
       const AUTH_SPECS = {
         sacral: "薦骨權威（當下第一時間的身體嗯／嗯嗯聲）",
         solar: "情緒中心權威（情緒浪潮中沒有當下的真相，需等待週期平復）",
-        splenic: "脾中心權威（當下的直覺警訊只有一次，需立即信賴）",
+        splenic: "脾中心權威（當下的直警警訊只有一次，需立即信賴）",
         ego: "意志力權威（向內確認『我真心承諾、我說到做到』的驅動力）",
         self: "自我投射權威（透過向信賴的朋友傾訴，聽見自己說出的真心話）",
         mental: "環境／無內在權威（需處於正確且舒適的物理空間中進行思考）",
