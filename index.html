@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>偉特地景・載具校準與即時視覺調校盤</title>
+  <title>偉特地景・載具校準與即時視覺調校盤 (含地貌寬度)</title>
   <style>
     :root {
       --bg-color: #171615;
@@ -134,7 +134,7 @@
 <body>
 
   <header>
-    <h1>偉特地景・即時視覺調校盤</h1>
+    <h1>偉特地景・全參數即時視覺調校盤</h1>
   </header>
 
   <div class="main-container">
@@ -146,7 +146,7 @@
     <div class="tuner-panel">
       <h3>
         <span>即時預覽與比例調校</span>
-        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">拖曳滑桿即時渲染，不用每次推 code！</span>
+        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">支援地貌橫向寬度與出口動態咬合</span>
       </h3>
 
       <div class="tuner-selectors">
@@ -189,34 +189,43 @@
       </div>
 
       <div class="sliders-grid">
+        <!-- 地貌橫向寬度與高度控制 -->
+        <div class="slider-item">
+          <label>地貌橫向寬度 (Ground Width) <span id="valGroundW">1.00</span></label>
+          <input type="range" id="tuneGroundW" min="0.60" max="1.00" step="0.01" value="1.00" oninput="liveRender()">
+        </div>
+        <div class="slider-item">
+          <label>地貌高度沉降 (Ground Height) <span id="valGroundH">0.52</span></label>
+          <input type="range" id="tuneGroundH" min="0.30" max="0.75" step="0.01" value="0.52" oninput="liveRender()">
+        </div>
+
+        <!-- 出口定位與縮放 -->
         <div class="slider-item">
           <label>出口水平 X 位置 <span id="valExitX">0.66</span></label>
-          <input type="range" id="tuneExitX" min="0.4" max="0.85" step="0.01" value="0.66" oninput="liveRender()">
+          <input type="range" id="tuneExitX" min="0.45" max="0.85" step="0.01" value="0.66" oninput="liveRender()">
         </div>
         <div class="slider-item">
-          <label>出口垂直 Y 位置 (貼地度) <span id="valExitY">0.92</span></label>
-          <input type="range" id="tuneExitY" min="0.5" max="1.0" step="0.01" value="0.92" oninput="liveRender()">
+          <label>出口垂直 Y 位置 (貼地度) <span id="valExitY">0.96</span></label>
+          <input type="range" id="tuneExitY" min="0.55" max="1.02" step="0.01" value="0.96" oninput="liveRender()">
         </div>
         <div class="slider-item">
-          <label>出口縮放寬度 (Size) <span id="valExitW">0.34</span></label>
-          <input type="range" id="tuneExitW" min="0.15" max="0.55" step="0.01" value="0.34" oninput="liveRender()">
+          <label>出口縮放寬度 (Exit Size) <span id="valExitW">0.34</span></label>
+          <input type="range" id="tuneExitW" min="0.18" max="0.55" step="0.01" value="0.34" oninput="liveRender()">
         </div>
-        <div class="slider-item">
-          <label>地貌高度 (Ground Sink) <span id="valGroundH">0.52</span></label>
-          <input type="range" id="tuneGroundH" min="0.3" max="0.8" step="0.01" value="0.52" oninput="liveRender()">
-        </div>
+
+        <!-- 旅人定位與縮放 -->
         <div class="slider-item">
           <label>人物水平 X 位置 <span id="valFigX">0.08</span></label>
-          <input type="range" id="tuneFigX" min="0.02" max="0.3" step="0.01" value="0.08" oninput="liveRender()">
+          <input type="range" id="tuneFigX" min="0.02" max="0.30" step="0.01" value="0.08" oninput="liveRender()">
         </div>
         <div class="slider-item">
-          <label>人物大小 (Size) <span id="valFigH">0.38</span></label>
-          <input type="range" id="tuneFigH" min="0.2" max="0.6" step="0.01" value="0.38" oninput="liveRender()">
+          <label>人物大小 (Figure Size) <span id="valFigH">0.38</span></label>
+          <input type="range" id="tuneFigH" min="0.20" max="0.55" step="0.01" value="0.38" oninput="liveRender()">
         </div>
       </div>
 
       <div>
-        <label style="font-size: 0.75rem; color:#888;">當前最佳參數紀錄（調好滿意後複製）：</label>
+        <label style="font-size: 0.75rem; color:#888;">當前最佳參數紀錄（調好滿意後複製給我）：</label>
         <div class="code-export" id="codeExport"></div>
       </div>
     </div>
@@ -257,29 +266,29 @@
     }
 
     async function liveRender() {
-      // 讀取當前控制台參數
       const sky = document.getElementById('tuneSky').value;
       const ground = document.getElementById('tuneGround').value;
       const exit = document.getElementById('tuneExit').value;
       const fig = document.getElementById('tuneFigure').value;
 
+      const groundWRatio = parseFloat(document.getElementById('tuneGroundW').value);
+      const groundHRatio = parseFloat(document.getElementById('tuneGroundH').value);
       const exitXRatio = parseFloat(document.getElementById('tuneExitX').value);
       const exitYRatio = parseFloat(document.getElementById('tuneExitY').value);
       const exitWRatio = parseFloat(document.getElementById('tuneExitW').value);
-      const groundHRatio = parseFloat(document.getElementById('tuneGroundH').value);
       const figXRatio = parseFloat(document.getElementById('tuneFigX').value);
       const figHRatio = parseFloat(document.getElementById('tuneFigH').value);
 
-      // 更新數字顯示
+      document.getElementById('valGroundW').innerText = groundWRatio.toFixed(2);
+      document.getElementById('valGroundH').innerText = groundHRatio.toFixed(2);
       document.getElementById('valExitX').innerText = exitXRatio.toFixed(2);
       document.getElementById('valExitY').innerText = exitYRatio.toFixed(2);
       document.getElementById('valExitW').innerText = exitWRatio.toFixed(2);
-      document.getElementById('valGroundH').innerText = groundHRatio.toFixed(2);
       document.getElementById('valFigX').innerText = figXRatio.toFixed(2);
       document.getElementById('valFigH').innerText = figHRatio.toFixed(2);
 
       document.getElementById('codeExport').innerText = 
-        `Exit: X=${exitXRatio.toFixed(2)}, Y=${exitYRatio.toFixed(2)}, W=${exitWRatio.toFixed(2)} | GroundH=${groundHRatio.toFixed(2)} | Fig: X=${figXRatio.toFixed(2)}, H=${figHRatio.toFixed(2)}`;
+        `Ground: W=${groundWRatio.toFixed(2)}, H=${groundHRatio.toFixed(2)} | Exit: X=${exitXRatio.toFixed(2)}, Y=${exitYRatio.toFixed(2)}, W=${exitWRatio.toFixed(2)} | Fig: X=${figXRatio.toFixed(2)}, H=${figHRatio.toFixed(2)}`;
 
       const W = canvas.width;
       const H = canvas.height;
@@ -313,15 +322,21 @@
       // 1. 天空
       if (imgSky) ctx.drawImage(imgSky, margin, margin, innerW, innerH);
 
-      // 2. 地貌
+      // 2. 地貌（支援自訂橫向寬度與垂直高度）
       if (imgGround) {
+        ctx.save();
+        const gW = innerW * groundWRatio;
         const gH = innerH * groundHRatio;
         const gY = margin + innerH - gH;
-        ctx.drawImage(imgGround, margin, gY, innerW, gH);
+
+        // 如果縮窄寬度，右側自然留空給出口
+        ctx.drawImage(imgGround, margin, gY, gW, gH);
+        ctx.restore();
       }
 
       // 3. 出口
       if (imgExit) {
+        ctx.save();
         const exitAspect = (imgExit.width / imgExit.height) || 1.2;
         const exitW = innerW * exitWRatio;
         const exitH = exitW / exitAspect;
@@ -330,17 +345,26 @@
 
         ctx.globalAlpha = 0.96;
         ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
-        ctx.globalAlpha = 1.0;
+
+        // 遠景薄霧微染
+        const hazeGrad = ctx.createLinearGradient(exitX, exitY, exitX, exitY + exitH);
+        hazeGrad.addColorStop(0, "transparent");
+        hazeGrad.addColorStop(1, "rgba(253, 249, 240, 0.12)");
+        ctx.fillStyle = hazeGrad;
+        ctx.fillRect(exitX, exitY, exitW, exitH);
+        ctx.restore();
       }
 
       // 4. 人物
       if (imgFigure) {
+        ctx.save();
         const figH = innerH * figHRatio;
         const figAspect = (imgFigure.width / imgFigure.height) || 0.6;
         const figW = figH * figAspect;
         const figX = margin + (innerW * figXRatio);
         const figY = margin + (innerH * 0.90) - figH;
         ctx.drawImage(imgFigure, figX, figY, figW, figH);
+        ctx.restore();
       }
 
       ctx.restore();
@@ -353,7 +377,6 @@
       ctx.strokeRect(margin - 6, margin - 6, innerW + 12, innerH + 12);
     }
 
-    // 啟動時立即渲染
     window.onload = () => { liveRender(); };
   </script>
 </body>
