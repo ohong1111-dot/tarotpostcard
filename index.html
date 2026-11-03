@@ -3,937 +3,776 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>當下風景｜1909 偉特原畫 × 人類圖載具出廠校準儀</title>
+  <title>偉特地景・塞爾特十卡心靈載具校準系統</title>
   <style>
     :root {
-      --bg-wood: #181614;
-      --bg-parchment: #f4ede2;
-      --parchment-border: #d5c7b2;
-      --ink-black: #1f1d1a;
-      --ink-muted: #575249;
-      --tarot-gold: #c59b27;
-      --tarot-red: #8c2d19;
-      --font-serif: "Songti TC", "Noto Serif TC", "Baskerville", serif;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --bg-color: #171615;
+      --card-bg: #23211f;
+      --text-main: #f5f2eb;
+      --accent-gold: #c5a059;
+      --border-color: #3d3a36;
+      --cinnabar-red: #8a3324;
+      --text-muted: #a8a29e;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      background-color: var(--bg-wood);
-      color: var(--ink-black);
-      font-family: var(--font-sans);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: "PingFang TC", "Microsoft JhengHei", -apple-system, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 32px 16px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 900px;
-      background: var(--bg-parchment);
-      border-radius: 4px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-      border: 1px solid var(--parchment-border);
-      padding: 36px 32px;
+      padding: 26px 16px 60px;
     }
 
     header {
       text-align: center;
-      margin-bottom: 28px;
-      border-bottom: 2px solid var(--parchment-border);
-      padding-bottom: 20px;
+      margin-bottom: 20px;
     }
 
     h1 {
-      font-family: var(--font-serif);
-      font-size: 1.85rem;
-      color: var(--ink-black);
-      letter-spacing: 0.12em;
-      margin-bottom: 8px;
-    }
-
-    p.subtitle {
-      font-size: 0.95rem;
-      color: var(--ink-muted);
-      line-height: 1.6;
-    }
-
-    /* 人類圖載具規格輸入區 */
-    .hd-input-section {
-      background: rgba(0,0,0,0.03);
-      border: 1px dashed var(--parchment-border);
-      border-radius: 4px;
-      padding: 16px 20px;
-      margin-bottom: 24px;
-    }
-
-    .hd-input-title {
-      font-family: var(--font-serif);
-      font-size: 0.95rem;
-      font-weight: bold;
-      color: var(--ink-black);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .hd-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-
-    .hd-field label {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--ink-muted);
-      margin-bottom: 4px;
-    }
-
-    .hd-field select {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid var(--parchment-border);
-      background: #fff;
-      font-size: 0.88rem;
-      color: var(--ink-black);
-      border-radius: 3px;
-    }
-
-    /* 抽牌與畫布展示區 */
-    .action-bar {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .btn-draw {
-      background: var(--ink-black);
-      color: var(--bg-parchment);
-      border: 1px solid var(--tarot-gold);
-      padding: 12px 36px;
-      font-size: 1rem;
-      font-family: var(--font-serif);
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-draw:hover {
-      background: var(--tarot-red);
-      color: #fff;
-    }
-
-    .postcard-container {
-      margin: 0 auto 32px auto;
-      text-align: center;
-    }
-
-    canvas#postcardCanvas {
-      width: 100%;
-      max-width: 840px;
-      height: auto;
-      aspect-ratio: 2 / 1;
-      border: 1px solid var(--parchment-border);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      background: #dfd7c9;
-      display: block;
-      margin: 0 auto;
-    }
-
-    .download-bar {
-      margin-top: 12px;
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .btn-secondary {
-      background: transparent;
-      border: 1px solid var(--ink-black);
-      color: var(--ink-black);
-      padding: 8px 20px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      border-radius: 3px;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(0,0,0,0.06);
-    }
-
-    /* 牌陣與出廠手冊解讀區 */
-    .reading-section {
-      margin-top: 32px;
-      border-top: 1px solid var(--parchment-border);
-      padding-top: 24px;
-    }
-
-    .section-title {
-      font-family: var(--font-serif);
-      font-size: 1.25rem;
-      margin-bottom: 16px;
-      color: var(--ink-black);
-    }
-
-    .slots-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-      margin-bottom: 28px;
-    }
-
-    .slot-card {
-      background: #fff;
-      border: 1px solid var(--parchment-border);
-      padding: 12px 14px;
-      border-radius: 3px;
-    }
-
-    .slot-card-header {
-      font-size: 0.75rem;
-      color: var(--tarot-gold);
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 4px;
-    }
-
-    .slot-card-name {
-      font-family: var(--font-serif);
-      font-size: 0.95rem;
-      font-weight: bold;
-      color: var(--ink-black);
+      font-size: 1.55rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      color: var(--accent-gold);
       margin-bottom: 6px;
     }
 
-    .slot-card-desc {
-      font-size: 0.82rem;
-      color: var(--ink-muted);
-      line-height: 1.5;
-    }
-
-    /* 微付費解鎖層與全文手冊 */
-    .paywall-box {
-      background: #fff;
-      border: 1px solid var(--tarot-gold);
-      border-radius: 4px;
-      padding: 24px;
-      text-align: center;
-      position: relative;
-      margin-top: 24px;
-    }
-
-    .paywall-badge {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--tarot-gold);
-      color: #fff;
-      font-size: 0.75rem;
-      padding: 2px 14px;
-      border-radius: 10px;
+    p.subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
       letter-spacing: 0.05em;
     }
 
-    .paywall-title {
-      font-family: var(--font-serif);
-      font-size: 1.15rem;
-      margin-top: 4px;
-      margin-bottom: 8px;
-    }
-
-    .paywall-desc {
-      font-size: 0.88rem;
-      color: var(--ink-muted);
-      max-width: 580px;
-      margin: 0 auto 20px auto;
-      line-height: 1.6;
-    }
-
-    .btn-pay {
-      background: var(--tarot-red);
-      color: #fff;
-      border: none;
-      padding: 12px 32px;
-      font-size: 0.95rem;
-      font-family: var(--font-serif);
-      cursor: pointer;
-      border-radius: 3px;
-    }
-
-    .btn-pay:hover {
-      background: #732312;
-    }
-
-    /* 手冊全文解鎖面板 */
-    .manual-unlocked {
-      display: none;
-      background: #fff;
-      border: 1px solid var(--parchment-border);
-      padding: 28px;
-      border-radius: 4px;
-      margin-top: 24px;
-    }
-
-    .manual-header {
-      border-bottom: 1px solid var(--parchment-border);
-      padding-bottom: 14px;
-      margin-bottom: 18px;
-    }
-
-    .manual-title {
-      font-family: var(--font-serif);
-      font-size: 1.25rem;
-      color: var(--ink-black);
-    }
-
-    .manual-body {
-      font-size: 0.92rem;
-      line-height: 1.8;
-      color: var(--ink-black);
-    }
-
-    .manual-body p {
-      margin-bottom: 14px;
-    }
-
-    /* 付款與發票託管彈窗 */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.65);
-      z-index: 999;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
-    }
-
-    .modal-box {
-      background: var(--bg-parchment);
-      width: 100%;
-      max-width: 520px;
-      border-radius: 4px;
-      border: 1px solid var(--parchment-border);
-      padding: 28px;
-      box-shadow: 0 16px 36px rgba(0,0,0,0.4);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-box h3 {
-      font-family: var(--font-serif);
-      font-size: 1.2rem;
-      margin-bottom: 12px;
-      border-bottom: 1px solid var(--parchment-border);
-      padding-bottom: 8px;
-    }
-
-    .form-group {
-      margin-bottom: 14px;
-      text-align: left;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: bold;
-      margin-bottom: 4px;
-      color: var(--ink-black);
-    }
-
-    .form-group input, .form-group select {
-      width: 100%;
-      padding: 8px 10px;
-      font-size: 0.88rem;
-      border: 1px solid var(--parchment-border);
-      background: #fff;
-      border-radius: 3px;
-    }
-
-    .invoice-notice {
-      background: rgba(0,0,0,0.04);
-      border-left: 3px solid var(--tarot-gold);
-      padding: 10px 12px;
-      font-size: 0.76rem;
-      line-height: 1.5;
-      color: var(--ink-muted);
-      margin-bottom: 16px;
-    }
-
-    .modal-actions {
+    .main-container {
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 780px;
+    }
+
+    /* 人類圖載具規格前置選單 */
+    .hd-selector-box {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 16px 20px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hd-selector-box h3 {
+      font-size: 0.95rem;
+      color: var(--accent-gold);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+
+    .hd-fields {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hd-field-group {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .hd-field-group label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hd-field-group select {
+      background: #171615;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 9px 12px;
+      font-size: 0.88rem;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .hd-field-group select:focus {
+      border-color: var(--accent-gold);
+    }
+
+    /* 橫版古典明信片 3:2 容器 */
+    .canvas-wrapper {
+      background-color: #fdf9f0;
+      border-radius: 4px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      width: 100%;
+      aspect-ratio: 3 / 2;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 12px;
+    }
+
+    button {
+      padding: 13px 20px;
+      font-size: 0.95rem;
+      border: 1px solid var(--accent-gold);
+      background: transparent;
+      color: var(--accent-gold);
+      border-radius: 2px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--accent-gold);
+      color: #171615;
+    }
+
+    button.btn-primary {
+      background: var(--cinnabar-red);
+      border-color: var(--cinnabar-red);
+      color: #fff;
+    }
+
+    button.btn-primary:hover {
+      background: #a33e2c;
+      border-color: #a33e2c;
+    }
+
+    button.btn-pay {
+      background: #2b261f;
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      font-weight: 500;
+    }
+
+    button.btn-pay:hover {
+      background: var(--accent-gold);
+      color: #171615;
+    }
+
+    /* 塞爾特十卡與300字手冊區塊 */
+    .card-info {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 24px;
+      border-radius: 4px;
+      width: 100%;
+      display: none;
+    }
+
+    .hd-badge {
+      display: inline-block;
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .card-info h2 {
+      font-size: 1.22rem;
+      color: var(--accent-gold);
+      margin-bottom: 14px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .celtic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px;
+      border-radius: 3px;
+      margin-bottom: 20px;
+      font-size: 0.78rem;
+      border: 1px solid #333;
+    }
+
+    .celtic-item {
+      color: #bbb;
+      line-height: 1.4;
+    }
+
+    .celtic-item span {
+      color: var(--accent-gold);
+      display: block;
+      font-weight: 500;
+    }
+
+    .manual-content {
+      font-size: 0.92rem;
+      line-height: 1.85;
+      color: #d6d3cd;
+      margin-bottom: 24px;
+      text-align: justify;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+    }
+
+    /* 付費買斷與信物解鎖區塊 */
+    .payment-section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: rgba(0, 0, 0, 0.28);
+      padding: 18px;
+      border-radius: 4px;
+      border: 1px dashed #4a453e;
+    }
+
+    .invoice-opt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .invoice-opt input {
+      accent-color: var(--accent-gold);
+      cursor: pointer;
+    }
+
+    .invoice-input-box {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .invoice-input-box input {
+      background: #171615;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .invoice-input-box input:focus {
+      border-color: var(--accent-gold);
+    }
+
+    .unlocked-tool-card {
+      display: none;
+      background: #1d1c1a;
+      border: 1px solid var(--accent-gold);
+      padding: 16px;
+      border-radius: 4px;
+      margin-top: 10px;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .unlocked-tool-card img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      background: #fdf9f0;
+      padding: 4px;
+      border-radius: 2px;
+    }
+
+    .tool-desc h4 {
+      color: var(--accent-gold);
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .tool-desc p {
+      font-size: 0.84rem;
+      color: #bbb;
+      line-height: 1.5;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <h1>當下風景・載具出廠校準儀</h1>
-      <p class="subtitle">1909 正統偉特凱爾特十字客觀顯影 × 人類圖生理心智硬界限校準</p>
-    </header>
+  <header>
+    <h1>偉特地景・載具校準</h1>
+    <p class="subtitle">塞爾特十字 10 卡牌陣 × 個人人類圖原型 × 20 元素顯影</p>
+  </header>
 
-    <!-- 人類圖載具規格自選區 -->
-    <section class="hd-input-section">
-      <div class="hd-input-title">
-        <span>⚙️ 人類圖載具出廠參數登錄（選填，客製對齊出口手冊）</span>
-      </div>
-      <div class="hd-grid">
-        <div class="hd-field">
-          <label>能量類型 (Energy Type)</label>
-          <select id="hdType">
-            <option value="generator" selected>生產者 (Generator) / 薦骨有定義</option>
-            <option value="mg">顯示型生產者 (MG) / 多工回應</option>
-            <option value="projector">投射者 (Projector) / 等待邀請</option>
-            <option value="manifestor">顯示者 (Manifestor) / 主動告知</option>
-            <option value="reflector">反映者 (Reflector) / 等待月週期</option>
+  <div class="main-container">
+    <div class="hd-selector-box">
+      <h3>設定個人人類圖載具規格</h3>
+      <div class="hd-fields">
+        <div class="hd-field-group">
+          <label for="selectHdType">載具類型（Type）</label>
+          <select id="selectHdType" onchange="updateAuthorityOptions()">
+            <option value="generator">生產者（Generator）/ 顯生（MG）</option>
+            <option value="projector">投射者（Projector）</option>
+            <option value="manifestor">顯示者（Manifestor）</option>
+            <option value="reflector">反映者（Reflector）</option>
           </select>
         </div>
-        <div class="hd-field">
-          <label>人生角色 (Profile)</label>
-          <select id="hdProfile">
-            <option value="3/5" selected>3/5 經驗實踐與危機解方</option>
-            <option value="1/3">1/3 研究打底與試錯突破</option>
-            <option value="2/4">2/4 天賦獨處與熟人網絡</option>
-            <option value="4/6">4/6 人脈信任與人生典範</option>
-            <option value="5/1">5/1 異端拯救與真理深鑽</option>
-            <option value="6/2">6/2 智慧超然與天賦示範</option>
+        <div class="hd-field-group">
+          <label for="selectHdAuth">內在權威（Authority）</label>
+          <select id="selectHdAuth">
+            <option value="sacral">薦骨權威（Sacral）</option>
+            <option value="solar">情緒中心權威（Solar Plexus）</option>
           </select>
         </div>
-        <div class="hd-field">
-          <label>內在權威 (Inner Authority)</label>
-          <select id="hdAuthority">
-            <option value="sacral" selected>薦骨權威 (當下身體聲音/嗯)</option>
-            <option value="solar">情緒權威 (等待情緒週期澄清)</option>
-            <option value="splenic">直覺權威 (當下一瞬冷靜警告)</option>
-            <option value="ego">意志力權威 (忠於承諾與心臟)</option>
-            <option value="none">無內在權威 (環境/自我投射)</option>
-          </select>
-        </div>
-        <div class="hd-field">
-          <label>主要未定義中心 (Open Center)</label>
-          <select id="hdOpenCenter">
-            <option value="root" selected>開放根部 (習慣盲目吸收壓力趕工)</option>
-            <option value="heart">開放意志力 (不斷證明自我價值與硬撐)</option>
-            <option value="solar">開放情緒 (恐懼衝突與他人情緒震盪)</option>
-            <option value="ajna">開放頭腦 (執著於確定性與精神內耗)</option>
-            <option value="throat">開放喉嚨 (急於發話與爭取他人注意)</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <!-- 抽牌互動按鈕 -->
-    <div class="action-bar">
-      <button class="btn-draw" id="btnDraw">靜心抽牌・顯影當下風景</button>
-    </div>
-
-    <!-- 840 x 420 畫布渲染區 -->
-    <div class="postcard-container">
-      <canvas id="postcardCanvas" width="840" height="420"></canvas>
-      <div class="download-bar">
-        <button class="btn-secondary" id="btnDownload" style="display:none;">下載專屬木刻明信片 (PNG)</button>
       </div>
     </div>
 
-    <!-- 牌陣詳情與出口定位 -->
-    <section class="reading-section" id="readingSection" style="display:none;">
-      <h2 class="section-title">關鍵五層維度・空間落點</h2>
-      <div class="slots-grid">
-        <div class="slot-card">
-          <div class="slot-card-header">牌 8 外在不可控環境 ➔ 構圖背景天空</div>
-          <div class="slot-card-name" id="tagSkyName">-</div>
-          <div class="slot-card-desc" id="tagSkyDesc">-</div>
-        </div>
-        <div class="slot-card">
-          <div class="slot-card-header">牌 4 過去沉澱根基 ➔ 腳下立足地貌</div>
-          <div class="slot-card-name" id="tagGroundName">-</div>
-          <div class="slot-card-desc" id="tagGroundDesc">-</div>
-        </div>
-        <div class="slot-card">
-          <div class="slot-card-header">牌 1 當下心智現狀 ➔ 旅人姿態剪影</div>
-          <div class="slot-card-name" id="tagFigureName">-</div>
-          <div class="slot-card-desc" id="tagFigureDesc">-</div>
-        </div>
-        <div class="slot-card">
-          <div class="slot-card-header">牌 9 隨身資源道具 ➔ 前景物理錨定</div>
-          <div class="slot-card-name" id="tagToolName">-</div>
-          <div class="slot-card-desc" id="tagToolDesc">-</div>
-        </div>
-        <div class="slot-card">
-          <div class="slot-card-header">牌 10 最終現實出口 ➔ 遠方生路通道</div>
-          <div class="slot-card-name" id="tagExitName">-</div>
-          <div class="slot-card-desc" id="tagExitDesc">-</div>
-        </div>
-      </div>
+    <div class="canvas-wrapper">
+      <canvas id="postcardCanvas" width="1200" height="800"></canvas>
+    </div>
 
-      <!-- NT$88 微付費層提示卡 -->
-      <div class="paywall-box" id="paywallBox">
-        <span class="paywall-badge">載具出廠完整處方</span>
-        <h3 class="paywall-title">解鎖牌 10 出口對齊 × 人類圖生理硬界限完整說明書</h3>
-        <p class="paywall-desc">
-          包含當前未定義中心的排毒警訊、本週停損動作清單、專屬植物香氛嗅覺校準，以及白紙黑字帳目防禦指令。
-        </p>
-        <button class="btn-pay" id="btnOpenPayModal">取得完整出廠手冊 (NT$ 88)</button>
-      </div>
+    <div class="controls">
+      <button class="btn-primary" id="btnDraw" onclick="runCelticCrossSystem()">感應塞爾特十字十卡・顯影當下地景</button>
+    </div>
 
-      <!-- 已解鎖手冊全文 (預設隱藏) -->
-      <div class="manual-unlocked" id="manualUnlocked">
-        <div class="manual-header">
-          <h3 class="manual-title" id="manualHeaderTitle">載具出廠校準手冊・全文</h3>
-        </div>
-        <div class="manual-body" id="manualBodyContent"></div>
-      </div>
-    </section>
-  </div>
+    <div class="card-info" id="cardInfo">
+      <span class="hd-badge" id="hdBadge">HUMAN DESIGN 原型規格</span>
+      <h2 id="infoTitle">載具出廠定位</h2>
 
-  <!-- 付款與手開發票存證聲明彈窗 -->
-  <div class="modal-overlay" id="payModal">
-    <div class="modal-box">
-      <h3>微付費解鎖與憑證託管</h3>
+      <div class="celtic-grid" id="celticGrid"></div>
       
-      <div class="form-group">
-        <label>接收出廠手冊全文與明信片備份之 Email</label>
-        <input type="email" id="inputEmail" placeholder="your-email@example.com" required>
-      </div>
+      <div class="manual-content" id="manualText"></div>
 
-      <div class="form-group">
-        <label>統一發票開立方式</label>
-        <select id="invoiceType">
-          <option value="2">個人二聯式統一發票</option>
-          <option value="3">公司三聯式統一發票（需填統編與抬頭）</option>
-        </select>
-      </div>
+      <div class="payment-section">
+        <label class="invoice-opt">
+          <input type="checkbox" id="chkInvoice" onchange="toggleInvoice()">
+          需要實體手開發票代管存證（免填統編則開立個人收據存證）
+        </label>
+        
+        <div class="invoice-input-box" id="invoiceInputs">
+          <input type="text" id="invTitle" placeholder="買受人抬頭 / 姓名">
+          <input type="text" id="invTaxId" placeholder="統一編號（個人免填）">
+          <input type="email" id="invEmail" placeholder="存證憑據寄送 Email">
+        </div>
 
-      <div class="form-group" id="taxIdGroup" style="display: none;">
-        <label>統一編號 (8碼)</label>
-        <input type="text" id="inputTaxId" placeholder="例如：12345678" maxlength="8">
-        <label style="margin-top:6px;">公司抬頭</label>
-        <input type="text" id="inputTaxTitle" placeholder="例如：赫德文創股份有限公司">
-      </div>
+        <button class="btn-pay" id="btnPay" onclick="handlePayment()">
+          NT$ 88 微付費買斷・解鎖高解析原印明信片與專屬隨身信物
+        </button>
 
-      <div class="invoice-notice">
-        <strong>【紙本發票存證託管聲明】</strong><br>
-        本服務金額為新台幣 88 元整（內含營業稅）。依統一發票使用辦法，本店依法每筆開立實體紙本統一發票。為響應無紙化並加速交付，雙方合意委託本店代為免費保管紙本正本，開立後即拍照寄送至指定 Email 存證。每雙月開獎若中獎，將主動以掛號寄交正本以供兌獎；公司三聯式若需實體報帳，亦可於收到存證信件後回信索取正本寄送。
-      </div>
+        <div class="unlocked-tool-card" id="toolCard">
+          <img id="toolImg" src="" alt="專屬法器">
+          <div class="tool-desc">
+            <h4 id="toolTitle">專屬隨身法器信物</h4>
+            <p id="toolDetail"></p>
+          </div>
+        </div>
 
-      <div class="modal-actions">
-        <button class="btn-secondary" id="btnCloseModal">取消</button>
-        <button class="btn-pay" id="btnConfirmPay">確認支付 NT$ 88 並解鎖</button>
+        <button id="btnDownload" style="display: none; margin-top: 10px;" onclick="downloadPostcard()">
+          下載專屬高解析木刻明信片 (PNG)
+        </button>
       </div>
     </div>
   </div>
 
   <script>
-    // 78 張正統偉特牌基本資料庫
-    const TAROT_DECK = [
-      { id: "fool", name: "0 愚者", suit: "major", elem: "air", defaultFigure: "figure_walk", defaultExit: "exit_path" },
-      { id: "magician", name: "I 魔術師", suit: "major", elem: "air", defaultTool: "tool_wand", defaultExit: "exit_arch" },
-      { id: "priestess", name: "II 女祭司", suit: "major", elem: "water", defaultFigure: "figure_sit", defaultSky: "sky_night" },
-      { id: "empress", name: "III 皇后", suit: "major", elem: "earth", defaultGround: "ground_hill", defaultSky: "sky_gold" },
-      { id: "emperor", name: "IV 皇帝", suit: "major", elem: "fire", defaultGround: "ground_terrace", defaultTool: "tool_sword" },
-      { id: "hierophant", name: "V 教皇", suit: "major", elem: "earth", defaultGround: "ground_terrace", defaultExit: "exit_arch" },
-      { id: "lovers", name: "VI 戀人", suit: "major", elem: "air", defaultSky: "sky_gold", defaultExit: "exit_bridge" },
-      { id: "chariot", name: "VII 戰車", suit: "major", elem: "water", defaultFigure: "figure_walk", defaultExit: "exit_arch" },
-      { id: "strength", name: "VIII 力量", suit: "major", elem: "fire", defaultFigure: "figure_stand", defaultGround: "ground_hill" },
-      { id: "hermit", name: "IX 隱士", suit: "major", elem: "earth", defaultFigure: "figure_sit", defaultSky: "sky_night", defaultTool: "tool_wand" },
-      { id: "wheel", name: "X 命運之輪", suit: "major", elem: "fire", defaultSky: "sky_sunset", defaultExit: "exit_sea" },
-      { id: "justice", name: "XI 正義", suit: "major", elem: "air", defaultTool: "tool_sword", defaultFigure: "figure_guard" },
-      { id: "hanged", name: "XII 吊人", suit: "major", elem: "water", defaultFigure: "figure_sit", defaultSky: "sky_sunset" },
-      { id: "death", name: "XIII 死神", suit: "major", elem: "water", defaultSky: "sky_sunset", defaultExit: "exit_sea" },
-      { id: "temperance", name: "XIV 節制", suit: "major", elem: "fire", defaultGround: "ground_river", defaultTool: "tool_cup" },
-      { id: "devil", name: "XV 惡魔", suit: "major", elem: "earth", defaultSky: "sky_storm", defaultGround: "ground_cliff" },
-      { id: "tower", name: "XVI 高塔", suit: "major", elem: "fire", defaultSky: "sky_storm", defaultGround: "ground_cliff" },
-      { id: "star", name: "XVII 星星", suit: "major", elem: "air", defaultSky: "sky_night", defaultGround: "ground_river" },
-      { id: "moon", name: "XVIII 月亮", suit: "major", elem: "water", defaultSky: "sky_night", defaultGround: "ground_river", defaultExit: "exit_path" },
-      { id: "sun", name: "XIX 太陽", suit: "major", elem: "fire", defaultSky: "sky_gold", defaultGround: "ground_hill", defaultExit: "exit_arch" },
-      { id: "judgement", name: "XX 審判", suit: "major", elem: "fire", defaultSky: "sky_sunset", defaultExit: "exit_bridge" },
-      { id: "world", name: "XXI 世界", suit: "major", elem: "earth", defaultSky: "sky_gold", defaultExit: "exit_sea" },
-      // 四組小牌示範對應（涵蓋 56 張牌意之元素基礎）
-      { id: "wands_ace", name: "權杖一", suit: "wands", elem: "fire", defaultTool: "tool_wand", defaultSky: "sky_gold" },
-      { id: "wands_four", name: "權杖四", suit: "wands", elem: "fire", defaultExit: "exit_arch", defaultGround: "ground_hill" },
-      { id: "wands_ten", name: "權杖十", suit: "wands", elem: "fire", defaultFigure: "figure_guard", defaultSky: "sky_storm" },
-      { id: "cups_ace", name: "聖杯一", suit: "cups", elem: "water", defaultTool: "tool_cup", defaultGround: "ground_river" },
-      { id: "cups_eight", name: "聖杯八", suit: "cups", elem: "water", defaultFigure: "figure_walk", defaultSky: "sky_night", defaultExit: "exit_path" },
-      { id: "swords_ace", name: "寶劍一", suit: "swords", elem: "air", defaultTool: "tool_sword", defaultSky: "sky_storm" },
-      { id: "swords_nine", name: "寶劍九", suit: "swords", elem: "air", defaultFigure: "figure_sit", defaultSky: "sky_night" },
-      { id: "swords_ten", name: "寶劍十", suit: "swords", elem: "air", defaultGround: "ground_cliff", defaultSky: "sky_sunset" },
-      { id: "pents_ace", name: "錢幣一", suit: "pentacles", elem: "earth", defaultTool: "tool_coin", defaultGround: "ground_hill" },
-      { id: "pents_four", name: "錢幣四", suit: "pentacles", elem: "earth", defaultFigure: "figure_guard", defaultTool: "tool_coin" },
-      { id: "pents_ten", name: "錢幣十", suit: "pentacles", elem: "earth", defaultGround: "ground_terrace", defaultExit: "exit_arch" }
-    ];
-
-    // 擴充未列出牌卡的通配生成池
-    function getCardData(cardId) {
-      let found = TAROT_DECK.find(c => c.id === cardId);
-      if (found) return found;
-      return { id: "generic", name: "正統偉特牌意顯影", suit: "major", elem: "earth" };
-    }
-
-    // 模組化資產對照配置
-    const ASSET_CONFIG = {
-      skies: {
-        "sky_gold":   { name: "金色晴空", tone: "#f4db89", desc: "外在視野清澈無霧，局勢具備自發推進動能" },
-        "sky_storm":  { name: "雷雨烏雲", tone: "#484f59", desc: "外部壓力激化，存在突發風暴或邊界拉扯" },
-        "sky_night":  { name: "深藍星夜", tone: "#1e2838", desc: "客觀局勢休整中，宜暫緩對外擴張，回歸沉潛" },
-        "sky_sunset": { name: "黃昏暮色", tone: "#d67a4d", desc: "一個週期的收尾與過渡，光線溫和但不可戀戰" }
-      },
-      grounds: {
-        "ground_hill":    { name: "平緩草坡", yOffset: 240, desc: "過去根基柔和具彈性，有緩衝空間" },
-        "ground_cliff":   { name: "險峻斷崖", yOffset: 230, desc: "立足點緊繃且容錯率低，不可踩空" },
-        "ground_river":   { name: "溪流灘地", yOffset: 250, desc: "流動且帶有情感痕跡，正在洗滌舊有阻礙" },
-        "ground_terrace": { name: "古堡石階", yOffset: 235, desc: "依託於既有制度與堅固體制，規矩分明" }
-      },
-      exits: {
-        "exit_arch":   { name: "透光石門", desc: "明確的結構性出口，需以專業身份直穿而過" },
-        "exit_bridge": { name: "跨峽石橋", desc: "需要時間過渡的轉銜通道，連結新舊局勢" },
-        "exit_path":   { name: "盤旋山徑", desc: "步步為營的向上路徑，要求耐力與精確節奏" },
-        "exit_sea":    { name: "開闊海岸", desc: "徹底離開封閉峽谷，迎向全面重構的可能" }
-      },
-      figures: {
-        "figure_stand": { name: "拄杖遠眺", mirrorIfBlocked: true, desc: "維持清醒獨立觀察，不急於表態" },
-        "figure_sit":   { name: "盤坐沉思", mirrorIfBlocked: false, desc: "身心收斂冷靜，正在消化內部訊號" },
-        "figure_walk":  { name: "大步邁進", mirrorIfBlocked: true, desc: "載具已啟動，正朝向預定出口推進" },
-        "figure_guard": { name: "停步戒備", mirrorIfBlocked: false, desc: "建立剛性防守線，拒絕無邊界妥協" }
-      },
-      tools: {
-        "tool_wand":  { name: "生機木杖", desc: "行動發起力，點火即可生發新局" },
-        "tool_sword": { name: "筆直銀劍", desc: "理性剖析與合約白紙黑字，斬斷模糊" },
-        "tool_cup":   { name: "湧泉金杯", desc: "情感容量與包容修復，溫潤滋養" },
-        "tool_coin":  { name: "厚實金幣", desc: "帳目落實與重力接地，守住現實資產" }
-      }
-    };
-
-    let currentDrawResult = null;
     const canvas = document.getElementById('postcardCanvas');
     const ctx = canvas.getContext('2d');
 
-    // 圖像快取池
-    const imageCache = {};
+    const AUTH_CONFIG = {
+      generator: [
+        { val: "sacral", text: "薦骨權威（Sacral）" },
+        { val: "solar", text: "情緒中心權威（Solar Plexus）" }
+      ],
+      projector: [
+        { val: "solar", text: "情緒中心權威（Solar Plexus）" },
+        { val: "splenic", text: "脾／直覺權威（Splenic）" },
+        { val: "self", text: "自我投射權威（Self-Projected）" },
+        { val: "mental", text: "環境／無內在權威（Mental）" }
+      ],
+      manifestor: [
+        { val: "solar", text: "情緒中心權威（Solar Plexus）" },
+        { val: "splenic", text: "脾／直覺權威（Splenic）" },
+        { val: "ego", text: "意志力權威（Ego）" }
+      ],
+      reflector: [
+        { val: "lunar", text: "月亮週期權威（Lunar Cycle）" }
+      ]
+    };
+
+    function updateAuthorityOptions() {
+      const type = document.getElementById('selectHdType').value;
+      const authSelect = document.getElementById('selectHdAuth');
+      authSelect.innerHTML = AUTH_CONFIG[type].map(a => `<option value="${a.val}">${a.text}</option>`).join('');
+    }
+
+    const TAROT_DECK = [
+      { name: "愚者", elem: "air" }, { name: "魔術師", elem: "air" }, { name: "女祭司", elem: "water" },
+      { name: "皇后", elem: "earth" }, { name: "皇帝", elem: "fire" }, { name: "教皇", elem: "earth" },
+      { name: "戀人", elem: "air" }, { name: "戰車", elem: "water" }, { name: "力量", elem: "fire" },
+      { name: "隱士", elem: "earth" }, { name: "命運之輪", elem: "fire" }, { name: "正義", elem: "air" },
+      { name: "倒吊人", elem: "water" }, { name: "死神", elem: "water" }, { name: "節制", elem: "fire" },
+      { name: "惡魔", elem: "earth" }, { name: "高塔", elem: "fire" }, { name: "星星", elem: "air" },
+      { name: "月亮", elem: "water" }, { name: "太陽", elem: "fire" }, { name: "審判", elem: "fire" },
+      { name: "世界", elem: "earth" }
+    ];
+
+    const SUITS = [
+      { suit: "權杖", elem: "fire" },
+      { suit: "聖杯", elem: "water" },
+      { suit: "寶劍", elem: "air" },
+      { suit: "星幣", elem: "earth" }
+    ];
+    const RANKS = ["王牌", "二", "三", "四", "五", "六", "七", "八", "九", "十", "侍從", "騎士", "王后", "國王"];
+    SUITS.forEach(s => {
+      RANKS.forEach(r => {
+        TAROT_DECK.push({ name: `${s.suit}${r}`, elem: s.elem });
+      });
+    });
+
+    // 嚴格對應硬碟內的 20 個真實檔案
+    const ASSET_CONFIG = {
+      skies: {
+        sky_gold: { name: "暮日晨光", tone: "#f5d77f", elem: "fire" },
+        sky_sunset: { name: "落日餘暉", tone: "#e69c6d", elem: "air" },
+        sky_night: { name: "深藍子夜", tone: "#1e293b", elem: "water" },
+        sky_storm: { name: "風暴前夕", tone: "#94a3b8", elem: "earth" }
+      },
+      exits: {
+        exit_arch: { name: "雙塔石門", elem: "earth", guide: "需等待清晰的外在訊號方可穿越" },
+        exit_bridge: { name: "跨谷木橋", elem: "fire", guide: "跨越鴻溝，勿向過去的沈沒成本回望" },
+        exit_sea: { name: "汪洋出口", elem: "water", guide: "隨波順應大流，讓動能引領你抵達開闊水域" },
+        exit_path: { name: "林間小徑", elem: "air", guide: "放慢步伐讓路徑自現，切忌焦慮加速" }
+      },
+      grounds: {
+        ground_cliff: { name: "荒蕪峭壁", baseTone: "#9e9484", elem: "fire", env: "高地懸空，考驗對真實地心引力的信任" },
+        ground_hill: { name: "蒼茫起伏山丘", baseTone: "#a69b7c", elem: "earth", env: "地形平緩連綿，需要耐力穩紮穩打" },
+        ground_terrace: { name: "石階高台", baseTone: "#8b8377", elem: "air", env: "舊有防禦結構穩固，可居高臨下審視全局" },
+        ground_water: { name: "幽暗水岸", baseTone: "#4b6068", elem: "water", env: "情緒水流暗湧，唯有讓體感沉澱方能辨別方向" }
+      },
+      figures: {
+        figure_guard: { name: "持杖防禦", elem: "fire", posture: "防線堅固但過度消耗，請確認是在守護能量還是恐懼未知" },
+        figure_sit: { name: "盤坐靜觀", elem: "earth", posture: "切斷無效主動出擊，將注意力完全收回體內核心" },
+        figure_stand: { name: "佇立凝視", elem: "air", posture: "載具就位，目光清明，凝望遠方出路" },
+        figure_walk: { name: "啟程涉足", elem: "water", posture: "動能已被喚醒，請以單步為單位確認身體的真實興奮感" }
+      },
+      tools: {
+        tool_cup: { name: "盈滿聖杯", elem: "water", attr: "滋養感受與直覺流動", guide: "在複雜情境中保留心靈的純淨感知，不被現實功利淘洗。" },
+        tool_pentacle: { name: "地靈星幣", elem: "earth", attr: "物質顯化與肉身扎根", guide: "把抽象意念落地為實質產物，專注每一分資源的精確調度。" },
+        tool_sword: { name: "破局寶劍", elem: "air", attr: "心智清明與邊界決斷", guide: "斬斷拖泥帶水的無效關係，以理性之刃劃出神聖不可侵犯的界線。" },
+        tool_wand: { name: "權杖生機", elem: "fire", attr: "意志萌芽與創造動能", guide: "點燃內在原始的行動渴望，只要興奮感在，方向自會明朗。" }
+      }
+    };
 
     function loadImage(src) {
       return new Promise((resolve) => {
-        if (imageCache[src]) return resolve(imageCache[src]);
         const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = src;
+        if (img.complete) return resolve(img);
         img.onload = () => {
-          imageCache[src] = img;
-          resolve(img);
+          if ('decode' in img) {
+            img.decode().then(() => resolve(img)).catch(() => resolve(img));
+          } else {
+            resolve(img);
+          }
         };
         img.onerror = () => {
-          // 圖片不存在時優雅返回 null
+          console.warn("未找到圖檔：", src);
           resolve(null);
         };
-        img.src = src;
       });
     }
 
-    // 隨機抽樣 10 張牌模擬凱爾特十字，並映射 5 大視覺維度
-    function performDraw() {
-      // 隨機抽取五個對應維度
-      const skyKeys = Object.keys(ASSET_CONFIG.skies);
-      const groundKeys = Object.keys(ASSET_CONFIG.grounds);
-      const exitKeys = Object.keys(ASSET_CONFIG.exits);
-      const figureKeys = Object.keys(ASSET_CONFIG.figures);
-      const toolKeys = Object.keys(ASSET_CONFIG.tools);
+    let currentDrawData = null;
 
-      const skyKey = skyKeys[Math.floor(Math.random() * skyKeys.length)];
-      const groundKey = groundKeys[Math.floor(Math.random() * groundKeys.length)];
-      const exitKey = exitKeys[Math.floor(Math.random() * exitKeys.length)];
-      const figureKey = figureKeys[Math.floor(Math.random() * figureKeys.length)];
-      const toolKey = toolKeys[Math.floor(Math.random() * toolKeys.length)];
+    async function runCelticCrossSystem() {
+      const btn = document.getElementById('btnDraw');
+      btn.disabled = true;
+      btn.innerText = "感應塞爾特十卡中...";
 
-      // 判定是否鏡像翻轉（例如抽到停頓或內耗時，人物轉身朝左回看）
-      const shouldMirror = Math.random() > 0.5;
+      const userType = document.getElementById('selectHdType').value;
+      const userAuth = document.getElementById('selectHdAuth').value;
 
-      currentDrawResult = {
+      const shuffled = [...TAROT_DECK].sort(() => 0.5 - Math.random());
+      const cCards = shuffled.slice(0, 10);
+
+      const celticPositions = [
+        { pos: "1. 現狀核心", card: cCards[0] },
+        { pos: "2. 當前阻礙", card: cCards[1] },
+        { pos: "3. 意識焦點", card: cCards[2] },
+        { pos: "4. 潛意識根基", card: cCards[3] },
+        { pos: "5. 目標願景", card: cCards[4] },
+        { pos: "6. 近未來趨勢", card: cCards[5] },
+        { pos: "7. 自我姿態", card: cCards[6] },
+        { pos: "8. 外在環境", card: cCards[7] },
+        { pos: "9. 希望與恐懼", card: cCards[8] },
+        { pos: "10. 最終結果", card: cCards[9] }
+      ];
+
+      const skyElem = cCards[9].elem || cCards[4].elem;
+      const skyKey = Object.keys(ASSET_CONFIG.skies).find(k => ASSET_CONFIG.skies[k].elem === skyElem) || "sky_gold";
+
+      const exitElem = cCards[5].elem || cCards[3].elem;
+      const exitKey = Object.keys(ASSET_CONFIG.exits).find(k => ASSET_CONFIG.exits[k].elem === exitElem) || "exit_arch";
+
+      const groundElem = cCards[1].elem || cCards[7].elem || cCards[0].elem;
+      const groundKey = Object.keys(ASSET_CONFIG.grounds).find(k => ASSET_CONFIG.grounds[k].elem === groundElem) || "ground_hill";
+
+      const figElem = cCards[6].elem || cCards[8].elem;
+      const figKey = Object.keys(ASSET_CONFIG.figures).find(k => ASSET_CONFIG.figures[k].elem === figElem) || "figure_stand";
+
+      const toolElem = cCards[2].elem;
+      const toolKey = Object.keys(ASSET_CONFIG.tools).find(k => ASSET_CONFIG.tools[k].elem === toolElem) || "tool_wand";
+
+      currentDrawData = {
+        userHd: { type: userType, auth: userAuth },
+        celtic: celticPositions,
         sky: skyKey,
-        ground: groundKey,
         exit: exitKey,
-        figure: figureKey,
+        ground: groundKey,
+        figure: figKey,
         tool: toolKey,
-        isMirrored: shouldMirror,
-        timestamp: new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' })
+        timestamp: new Date().toISOString()
       };
 
-      renderLandscape(currentDrawResult);
-      updateReadingUI(currentDrawResult);
+      await renderLandscape(currentDrawData);
+      updateInfoCard(currentDrawData);
+
+      btn.disabled = false;
+      btn.innerText = "重新感應十卡・校準地景";
     }
 
-    // Canvas 五層動態渲染與古董羊皮紙融合
+    // 套版印刷標準版印引擎（1200x800 原點零誤差疊印）
     async function renderLandscape(data) {
-      const W = canvas.width;
-      const H = canvas.height;
+      const W = canvas.width;  // 1200
+      const H = canvas.height; // 800
 
       ctx.clearRect(0, 0, W, H);
 
-      // 載入 5 張資產圖
-      const imgSky = await loadImage(`assets/skies/${data.sky}.png`);
-      const imgExit = await loadImage(`assets/exits/${data.exit}.png`);
-      const imgGround = await loadImage(`assets/grounds/${data.ground}.png`);
-      const imgFigure = await loadImage(`assets/figures/${data.figure}.png`);
-      const imgTool = await loadImage(`assets/tools/${data.tool}.png`);
+      const [imgSky, imgGround, imgExit, imgFigure] = await Promise.all([
+        loadImage(`assets/skies/${data.sky}.png`),
+        loadImage(`assets/grounds/${data.ground}.png`),
+        loadImage(`assets/exits/${data.exit}.png`),
+        loadImage(`assets/figures/${data.figure}.png`)
+      ]);
 
-      // Layer 1: 天空背景（若無圖則繪製古典漸層底色）
+      // 1. 底紙羊皮紙
+      ctx.fillStyle = "#fdf9f0";
+      ctx.fillRect(0, 0, W, H);
+
+      const margin = 32;
+      const innerW = W - margin * 2;
+      const innerH = H - margin * 2 - 36;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(margin, margin, innerW, innerH);
+      ctx.clip();
+
+      // 版 1：天候色版（滿版鋪底）
+      ctx.globalCompositeOperation = 'source-over';
       if (imgSky) {
-        ctx.drawImage(imgSky, 0, 0, W, H);
+        ctx.drawImage(imgSky, margin, margin, innerW, innerH);
       } else {
-        const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.75);
+        const skyGrad = ctx.createLinearGradient(0, margin, 0, margin + innerH * 0.7);
         skyGrad.addColorStop(0, ASSET_CONFIG.skies[data.sky].tone);
-        skyGrad.addColorStop(1, "#f4ede2");
+        skyGrad.addColorStop(1, "#fcf6e8");
         ctx.fillStyle = skyGrad;
-        ctx.fillRect(0, 0, W, H);
+        ctx.fillRect(margin, margin, innerW, innerH);
       }
 
-      // Layer 2: 遠方生路出口 (遠景置中或偏右)
-      if (imgExit) {
-        ctx.drawImage(imgExit, 0, 0, W, H);
-      } else {
-        // 容錯備用繪製
-        ctx.save();
-        ctx.strokeStyle = "rgba(40, 35, 30, 0.4)";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(W * 0.65, H * 0.35, 80, 110);
-        ctx.restore();
-      }
-
-      // Layer 3: 立足地貌層 (覆蓋中下部)
-      const groundInfo = ASSET_CONFIG.grounds[data.ground];
+      // 版 2：立足地貌版（套印基底）
       if (imgGround) {
-        ctx.drawImage(imgGround, 0, 0, W, H);
-      } else {
         ctx.save();
-        ctx.fillStyle = "#828c68";
-        ctx.beginPath();
-        ctx.moveTo(0, groundInfo.yOffset);
-        ctx.bezierCurveTo(W * 0.3, groundInfo.yOffset - 30, W * 0.7, groundInfo.yOffset + 40, W, groundInfo.yOffset - 10);
-        ctx.lineTo(W, H);
-        ctx.lineTo(0, H);
-        ctx.closePath();
-        ctx.fill();
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.drawImage(imgGround, margin, margin, innerW, innerH);
         ctx.restore();
       }
 
-      // Layer 4: 旅人剪影（具備動態鏡像翻轉與地勢落點自適應）
-      ctx.save();
-      const figureY = groundInfo.yOffset - 140; // 踩在當前地貌的水平線上
-      const figureX = W * 0.28;
+      // 版 3：遠方生路出口版（套印右後方出路）
+      if (imgExit) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.drawImage(imgExit, margin, margin, innerW, innerH);
+        ctx.restore();
+      }
 
-      if (data.isMirrored) {
-        // 水平翻轉朝左
-        ctx.translate(figureX + 60, 0);
-        ctx.scale(-1, 1);
-        if (imgFigure) {
-          ctx.drawImage(imgFigure, -60, figureY, 120, 170);
-        } else {
-          ctx.fillStyle = "#1f1d1a";
-          ctx.fillRect(-20, figureY, 40, 140);
+      // 版 4：旅人姿態黑線版（套印左側主角）
+      if (imgFigure) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.drawImage(imgFigure, margin, margin, innerW, innerH);
+        ctx.restore();
+      }
+
+      ctx.restore(); // 結束裁切
+
+      // 1909 偉特古典雙層框線
+      ctx.strokeStyle = "#2b261f";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(margin, margin, innerW, innerH);
+
+      ctx.lineWidth = 1;
+      ctx.strokeRect(margin - 6, margin - 6, innerW + 12, innerH + 12);
+
+      // 底部情境銘刻文字
+      ctx.fillStyle = "#3e382f";
+      ctx.font = "italic 20px 'Times New Roman', serif";
+      ctx.textAlign = "center";
+      const sceneTitle = `${ASSET_CONFIG.grounds[data.ground].name} · ${ASSET_CONFIG.skies[data.sky].name}`;
+      ctx.fillText(`— ${sceneTitle} —`, W / 2, H - 18);
+    }
+
+    function updateInfoCard(data) {
+      const card = document.getElementById('cardInfo');
+      const badge = document.getElementById('hdBadge');
+      const title = document.getElementById('infoTitle');
+      const grid = document.getElementById('celticGrid');
+      const text = document.getElementById('manualText');
+
+      const sky = ASSET_CONFIG.skies[data.sky];
+      const ground = ASSET_CONFIG.grounds[data.ground];
+      const exit = ASSET_CONFIG.exits[data.exit];
+      const fig = ASSET_CONFIG.figures[data.figure];
+      const tool = ASSET_CONFIG.tools[data.tool];
+
+      const HD_SPECS = {
+        generator: {
+          name: "生產者 / 原型載具",
+          strategy: "等待回應（Wait to Respond）",
+          notSelf: "挫折感（Frustration）",
+          rule: "切勿用頭腦主動發起。專注眼前外界給予的刺激，傾聽薦骨發出的真實動能。"
+        },
+        projector: {
+          name: "投射者 / 導航載具",
+          strategy: "等待被正式邀請與賞識",
+          notSelf: "苦澀感（Bitterness）",
+          rule: "停止主動推銷自己的見解。唯有在對方真正開口邀請時，你的指引才能被看見並發揮價值。"
+        },
+        manifestor: {
+          name: "顯示者 / 破局載具",
+          strategy: "採取行動前主動告知",
+          notSelf: "憤怒感（Anger）",
+          rule: "你的天命在於開啟新局。但在行動踩下油門前，必須先告知受影響的周遭，以掃除阻力。"
+        },
+        reflector: {
+          name: "反映者 / 鏡面載具",
+          strategy: "歷經一個完整月亮週期再做重大決策",
+          notSelf: "失望感（Disappointment）",
+          rule: "你是環境的清澈鏡子。給予自己足夠的時間沈澱，不吸收任何外在的焦慮雜訊。"
         }
-      } else {
-        // 正常朝右
-        if (imgFigure) {
-          ctx.drawImage(imgFigure, figureX, figureY, 120, 170);
-        } else {
-          ctx.fillStyle = "#1f1d1a";
-          ctx.fillRect(figureX, figureY, 40, 140);
-        }
-      }
-      ctx.restore();
+      };
 
-      // Layer 5: 隨身道具（置於右側前景或腳邊）
-      ctx.save();
-      const toolX = W * 0.78;
-      const toolY = H * 0.62;
-      if (imgTool) {
-        ctx.drawImage(imgTool, 0, 0, W, H);
-      } else {
-        ctx.fillStyle = "#c59b27";
-        ctx.beginPath();
-        ctx.arc(toolX, toolY, 22, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = "#1f1d1a";
-        ctx.lineWidth = 3;
-        ctx.stroke();
-      }
-      ctx.restore();
+      const AUTH_SPECS = {
+        sacral: "薦骨權威（當下第一時間的身體嗯／嗯嗯聲）",
+        solar: "情緒中心權威（情緒浪潮中沒有當下的真相，需等待週期平復）",
+        splenic: "脾中心權威（當下的直覺警訊只有一次，需立即信賴）",
+        ego: "意志力權威（向內確認『我真心承諾、我說到做到』的驅動力）",
+        self: "自我投射權威（透過向信賴的朋友傾訴，聽見自己說出的真心話）",
+        mental: "環境／無內在權威（需處於正確且舒適的物理空間中進行思考）",
+        lunar: "月亮週期權威（跟隨 28 天行運逐步看清全貌）"
+      };
 
-      // Layer 6: 古董羊皮紙融合層與木刻版畫噪點 (Anti-Stiff Varnish)
-      applyParchmentVarnish(ctx, W, H, data.timestamp);
+      const userSpec = HD_SPECS[data.userHd.type];
+      const userAuthDesc = AUTH_SPECS[data.userHd.auth];
 
-      document.getElementById('btnDownload').style.display = "inline-block";
-    }
+      badge.innerText = `YOUR SPEC：${userSpec.name}`;
+      title.innerText = `出廠地景定位：${ground.name} × ${sky.name}`;
 
-    // 凡尼斯古籍融合濾鏡
-    function applyParchmentVarnish(context, W, H, dateText) {
-      context.save();
+      grid.innerHTML = data.celtic.map(c => `
+        <div class="celtic-item">
+          <span>${c.pos}</span>
+          ${c.card.name} (${c.card.elem.toUpperCase()})
+        </div>
+      `).join('');
 
-      // 1. 溫潤羊皮紙覆蓋 (柔和正片疊底)
-      context.globalCompositeOperation = 'multiply';
-      context.fillStyle = "rgba(244, 237, 226, 0.45)";
-      context.fillRect(0, 0, W, H);
+      text.innerHTML = `
+        <div style="background: rgba(0,0,0,0.3); border-left: 3px solid var(--accent-gold); padding: 12px 14px; margin-bottom: 18px; font-size: 0.85rem; line-height: 1.6;">
+          <strong style="color: var(--accent-gold);">【你的專屬出廠規格】</strong><br>
+          ・載具類型：${userSpec.name}<br>
+          ・決策權威：${userAuthDesc}<br>
+          ・人生策略：${userSpec.strategy}<br>
+          ・非自己警訊：${userSpec.notSelf}
+        </div>
 
-      // 2. 微弱暗角 (Vignette)
-      const vignette = context.createRadialGradient(W / 2, H / 2, W * 0.35, W / 2, H / 2, W * 0.65);
-      vignette.addColorStop(0, "rgba(0,0,0,0)");
-      vignette.addColorStop(1, "rgba(45, 36, 24, 0.35)");
-      context.fillStyle = vignette;
-      context.fillRect(0, 0, W, H);
+        <strong>【空間定位與天候狀態】</strong><br>
+        依據牌陣第 1、2、8 張牌聚合之實相，你的肉身載具正立足於「${ground.name}」，天候映照出「${sky.name}」。${ground.env}。外在場域的壓力並非針對你個人，而是既有的客觀法則。<br><br>
 
-      // 3. 恢復正常混合模式，繪製古典框線與印記
-      context.globalCompositeOperation = 'source-over';
-      context.strokeStyle = "#1f1d1a";
-      context.lineWidth = 10;
-      context.strokeRect(5, 5, W - 10, H - 10);
-      context.lineWidth = 1.5;
-      context.strokeRect(14, 14, W - 28, H - 28);
+        <strong>【出廠校準與遠方生路】</strong><br>
+        請依循你的出廠準則：${userSpec.rule} 目前第 7、9 張牌顯示你以「${fig.name}」模式面對：${fig.posture}。而第 4、6 張牌所指引的唯一生路，是右側地平線遠方的「${exit.name}」——${exit.guide}。由近處立足點望向遠方，切莫焦躁發起，讓正確權威引領步伐。<br><br>
 
-      // 右下角古籍印鑑
-      context.font = "italic 11px 'Baskerville', serif";
-      context.fillStyle = "rgba(31, 29, 26, 0.75)";
-      context.textAlign = "right";
-      context.fillText(`1909 RIDER-WAITE POSTCARD / ${dateText}`, W - 24, H - 22);
-
-      // 左下角防偽小印
-      context.fillStyle = "rgba(140, 45, 25, 0.8)";
-      context.fillRect(24, H - 42, 18, 18);
-      context.fillStyle = "#fff";
-      context.font = "bold 9px sans-serif";
-      context.textAlign = "center";
-      context.fillText("校", 33, H - 30);
-
-      context.restore();
-    }
-
-    // 更新介面卡片文字
-    function updateReadingUI(data) {
-      document.getElementById('readingSection').style.display = "block";
-      
-      const s = ASSET_CONFIG.skies[data.sky];
-      const g = ASSET_CONFIG.grounds[data.ground];
-      const f = ASSET_CONFIG.figures[data.figure];
-      const t = ASSET_CONFIG.tools[data.tool];
-      const e = ASSET_CONFIG.exits[data.exit];
-
-      document.getElementById('tagSkyName').textContent = s.name;
-      document.getElementById('tagSkyDesc').textContent = s.desc;
-
-      document.getElementById('tagGroundName').textContent = g.name;
-      document.getElementById('tagGroundDesc').textContent = g.desc;
-
-      document.getElementById('tagFigureName').textContent = f.name + (data.isMirrored ? "（轉身回望）" : "（面朝前方）");
-      document.getElementById('tagFigureDesc').textContent = f.desc;
-
-      document.getElementById('tagToolName').textContent = t.name;
-      document.getElementById('tagToolDesc').textContent = t.desc;
-
-      document.getElementById('tagExitName').textContent = e.name;
-      document.getElementById('tagExitDesc').textContent = e.desc;
-    }
-
-    // 產出 300 字深度載具出廠手冊全文
-    function generateDeepManual() {
-      const hdType = document.getElementById('hdType').value;
-      const hdProfile = document.getElementById('hdProfile').value;
-      const hdOpenCenter = document.getElementById('hdOpenCenter').value;
-      const exitInfo = ASSET_CONFIG.exits[currentDrawResult.exit];
-      const toolInfo = ASSET_CONFIG.tools[currentDrawResult.tool];
-
-      let typeAction = "";
-      if (hdType === "generator" || hdType === "mg") {
-        typeAction = "嚴禁主動發起無謂承諾。請等候外界明確人事物出現在眼前，讓薦骨以生理聲音（嗯/不要）給予客觀回饋。";
-      } else if (hdType === "projector") {
-        typeAction = "不可在未獲正式邀請與認可下強行指導局勢。你的能量僅供精確識人，過度涉入將導致深度苦澀。";
-      } else if (hdType === "manifestor") {
-        typeAction = "發起前務必事先告知周遭關係人，以告知降低阻力，避免不必要的憤怒拉扯。";
-      } else {
-        typeAction = "隨月亮週期運轉完整 28 天再行重大拍板，不要被短暫環境催促帶偏節奏。";
-      }
-
-      let centerDetox = "";
-      if (hdOpenCenter === "root") {
-        centerDetox = "【開放根部緊急停損】：你正在吸收身旁所有人的焦慮催促。請在今晚九點前關閉通訊軟體，明確將非你的待辦事項移出視線。他人趕時間，並非你的火警。";
-      } else if (hdOpenCenter === "heart") {
-        centerDetox = "【開放意志力防禦】：停下證明自己『做得到、靠得住』的無謂消耗。合約與報價寫明範圍，多一分工作即多一分收費，拒絕任何道德綁架。";
-      } else {
-        centerDetox = "【開放中心排毒】：當下請遠離高壓情緒場域至少 30 分鐘，回到個人獨立空間釋放外在殘留張力。";
-      }
-
-      return `
-        <p><strong>【載具當前坐標】</strong>：牌 10 現實出口已落定於<strong>「${exitInfo.name}」</strong>。這代表通往下一階段的通道並非在原地與阻礙周旋，而是透過此通道果斷抽身離開。</p>
-        <p><strong>【生理運作與行動防線】</strong>：對齊人生角色 ${hdProfile} 與當前載具設定：${typeAction}</p>
-        <p>${centerDetox}</p>
-        <p><strong>【物理重力錨定物】</strong>：隨身配置之<strong>「${toolInfo.name}」</strong>為你本週的具體執行槓桿。請勿使用情緒或空談應對挑戰，立即在白紙上列出實際數字、時間點與權限邊界。建議搭配岩蘭草或快樂鼠尾草進行嗅覺呼吸調節，讓肉體沉著接地。</p>
+        <strong>【隱藏隨身信物】</strong><br>
+        源於第 3 張意識焦點牌，你此行配備的核心資源為「${tool.name}」（${tool.attr}）。此信物已收斂至你的載具核心，完成解鎖後可獲取完整法器圖譜與邊界使用指引。
       `;
+
+      document.getElementById('toolCard').style.display = "none";
+      document.getElementById('btnPay').style.display = "block";
+      document.getElementById('btnDownload').style.display = "none";
+
+      card.style.display = "block";
     }
 
-    // 事件監聽綁定
-    document.getElementById('btnDraw').addEventListener('click', performDraw);
+    function toggleInvoice() {
+      const chk = document.getElementById('chkInvoice');
+      const inputs = document.getElementById('invoiceInputs');
+      inputs.style.display = chk.checked ? "flex" : "none";
+    }
 
-    // 下載明信片 PNG
-    document.getElementById('btnDownload').addEventListener('click', () => {
+    function handlePayment() {
+      const chk = document.getElementById('chkInvoice').checked;
+      let invoiceMsg = "開立個人存證代管收據";
+
+      if (chk) {
+        const title = document.getElementById('invTitle').value.trim();
+        const taxId = document.getElementById('invTaxId').value.trim();
+        const email = document.getElementById('invEmail').value.trim();
+        invoiceMsg = `手開發票存證：抬頭「${title || '個人'}」，統編「${taxId || '無'}」，寄送「${email || '未填寫'}」`;
+      }
+
+      alert(`【微付費買斷確認】\n金額：NT$ 88\n發票代管：${invoiceMsg}\n\n已成功解鎖高解析原印明信片與專屬信物卡！`);
+
+      const tool = ASSET_CONFIG.tools[currentDrawData.tool];
+      const toolImgEl = document.getElementById('toolImg');
+      
+      toolImgEl.onerror = function() {
+        this.onerror = null;
+        this.src = `https://api.iconify.design/game-icons:pentacle.svg?color=%23c5a059`;
+      };
+      toolImgEl.src = `assets/tools/${currentDrawData.tool}.png`;
+
+      document.getElementById('toolTitle').innerText = `解鎖隨身法器：${tool.name}`;
+      document.getElementById('toolDetail').innerHTML = `<strong>【核心屬性】</strong>${tool.attr}<br><strong>【出廠使用法則】</strong>${tool.guide}`;
+
+      document.getElementById('toolCard').style.display = "flex";
+      document.getElementById('btnPay').style.display = "none";
+      document.getElementById('btnDownload').style.display = "block";
+    }
+
+    function downloadPostcard() {
       const link = document.createElement('a');
-      link.download = `tarot_postcard_${Date.now()}.png`;
+      link.download = `Tarot_CelticCross_Wide_${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-    });
-
-    // 彈窗開啟與發票聯動控制
-    const payModal = document.getElementById('payModal');
-    document.getElementById('btnOpenPayModal').addEventListener('click', () => {
-      payModal.style.display = "flex";
-    });
-
-    document.getElementById('btnCloseModal').addEventListener('click', () => {
-      payModal.style.display = "none";
-    });
-
-    document.getElementById('invoiceType').addEventListener('change', (e) => {
-      const taxGroup = document.getElementById('taxIdGroup');
-      taxGroup.style.display = e.target.value === "3" ? "block" : "none";
-    });
-
-    // 付款確認與手冊全文解鎖
-    document.getElementById('btnConfirmPay').addEventListener('click', () => {
-      const email = document.getElementById('inputEmail').value.trim();
-      const invoiceType = document.getElementById('invoiceType').value;
-      const taxId = document.getElementById('inputTaxId').value.trim();
-
-      if (!email || !email.includes('@')) {
-        alert("請填寫正確有效的 Email，以便系統寄送出廠手冊備份與紙本發票存證照片。");
-        return;
-      }
-
-      if (invoiceType === "3" && taxId.length !== 8) {
-        alert("請填寫正確的 8 碼公司統一編號。");
-        return;
-      }
-
-      // 關閉彈窗
-      payModal.style.display = "none";
-      document.getElementById('paywallBox').style.display = "none";
-
-      // 解鎖全文
-      const manualBox = document.getElementById('manualUnlocked');
-      manualBox.style.display = "block";
-      document.getElementById('manualBodyContent').innerHTML = generateDeepManual();
-
-      // 平滑捲動至解鎖區
-      manualBox.scrollIntoView({ behavior: 'smooth' });
-    });
-
-    // 初始化頁面預設繪製一次
-    window.addEventListener('load', () => {
-      performDraw();
-    });
+    }
   </script>
 </body>
 </html>
