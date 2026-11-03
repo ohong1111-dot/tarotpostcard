@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>偉特地景・載具校準與即時視覺調校盤 (含地貌寬度)</title>
+  <title>偉特地景・全參數即時視覺調校盤 (含角度旋轉)</title>
   <style>
     :root {
       --bg-color: #171615;
@@ -39,7 +39,6 @@
       max-width: 860px;
     }
 
-    /* 橫版古典明信片 3:2 容器 */
     .canvas-wrapper {
       background-color: #fdf9f0;
       border-radius: 4px;
@@ -50,7 +49,6 @@
     }
     canvas { width: 100%; height: 100%; display: block; }
 
-    /* 即時視覺調校工作台 */
     .tuner-panel {
       width: 100%;
       background: #1f1d1a;
@@ -146,7 +144,7 @@
     <div class="tuner-panel">
       <h3>
         <span>即時預覽與比例調校</span>
-        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">支援地貌橫向寬度與出口動態咬合</span>
+        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">支援出口旋轉傾斜與地貌動態咬合</span>
       </h3>
 
       <div class="tuner-selectors">
@@ -199,7 +197,7 @@
           <input type="range" id="tuneGroundH" min="0.30" max="0.75" step="0.01" value="0.52" oninput="liveRender()">
         </div>
 
-        <!-- 出口定位與縮放 -->
+        <!-- 出口定位、縮放與旋轉角度 -->
         <div class="slider-item">
           <label>出口水平 X 位置 <span id="valExitX">0.66</span></label>
           <input type="range" id="tuneExitX" min="0.45" max="0.85" step="0.01" value="0.66" oninput="liveRender()">
@@ -211,6 +209,10 @@
         <div class="slider-item">
           <label>出口縮放寬度 (Exit Size) <span id="valExitW">0.34</span></label>
           <input type="range" id="tuneExitW" min="0.18" max="0.55" step="0.01" value="0.34" oninput="liveRender()">
+        </div>
+        <div class="slider-item">
+          <label>出口旋轉角度 (Exit Rotate Deg) <span id="valExitRot">0°</span></label>
+          <input type="range" id="tuneExitRot" min="-20" max="20" step="0.5" value="0" oninput="liveRender()">
         </div>
 
         <!-- 旅人定位與縮放 -->
@@ -225,7 +227,7 @@
       </div>
 
       <div>
-        <label style="font-size: 0.75rem; color:#888;">當前最佳參數紀錄（調好滿意後複製給我）：</label>
+        <label style="font-size: 0.75rem; color:#888;">當前最佳參數紀錄（調好滿意後複製）：</label>
         <div class="code-export" id="codeExport"></div>
       </div>
     </div>
@@ -276,6 +278,7 @@
       const exitXRatio = parseFloat(document.getElementById('tuneExitX').value);
       const exitYRatio = parseFloat(document.getElementById('tuneExitY').value);
       const exitWRatio = parseFloat(document.getElementById('tuneExitW').value);
+      const exitRotDeg = parseFloat(document.getElementById('tuneExitRot').value);
       const figXRatio = parseFloat(document.getElementById('tuneFigX').value);
       const figHRatio = parseFloat(document.getElementById('tuneFigH').value);
 
@@ -284,11 +287,12 @@
       document.getElementById('valExitX').innerText = exitXRatio.toFixed(2);
       document.getElementById('valExitY').innerText = exitYRatio.toFixed(2);
       document.getElementById('valExitW').innerText = exitWRatio.toFixed(2);
+      document.getElementById('valExitRot').innerText = `${exitRotDeg}°`;
       document.getElementById('valFigX').innerText = figXRatio.toFixed(2);
       document.getElementById('valFigH').innerText = figHRatio.toFixed(2);
 
       document.getElementById('codeExport').innerText = 
-        `Ground: W=${groundWRatio.toFixed(2)}, H=${groundHRatio.toFixed(2)} | Exit: X=${exitXRatio.toFixed(2)}, Y=${exitYRatio.toFixed(2)}, W=${exitWRatio.toFixed(2)} | Fig: X=${figXRatio.toFixed(2)}, H=${figHRatio.toFixed(2)}`;
+        `Ground: W=${groundWRatio.toFixed(2)}, H=${groundHRatio.toFixed(2)} | Exit: X=${exitXRatio.toFixed(2)}, Y=${exitYRatio.toFixed(2)}, W=${exitWRatio.toFixed(2)}, Rot=${exitRotDeg}° | Fig: X=${figXRatio.toFixed(2)}, H=${figHRatio.toFixed(2)}`;
 
       const W = canvas.width;
       const H = canvas.height;
@@ -322,19 +326,17 @@
       // 1. 天空
       if (imgSky) ctx.drawImage(imgSky, margin, margin, innerW, innerH);
 
-      // 2. 地貌（支援自訂橫向寬度與垂直高度）
+      // 2. 地貌（可縮寬度留出右側生路空間）
       if (imgGround) {
         ctx.save();
         const gW = innerW * groundWRatio;
         const gH = innerH * groundHRatio;
         const gY = margin + innerH - gH;
-
-        // 如果縮窄寬度，右側自然留空給出口
         ctx.drawImage(imgGround, margin, gY, gW, gH);
         ctx.restore();
       }
 
-      // 3. 出口
+      // 3. 出口（支援以底座為軸心的旋轉角度與透視）
       if (imgExit) {
         ctx.save();
         const exitAspect = (imgExit.width / imgExit.height) || 1.2;
@@ -342,6 +344,14 @@
         const exitH = exitW / exitAspect;
         const exitX = margin + (innerW * exitXRatio);
         const exitY = margin + (innerH * exitYRatio) - exitH;
+
+        // 以出口底部中心為旋轉支點
+        const pivotX = exitX + exitW / 2;
+        const pivotY = exitY + exitH;
+
+        ctx.translate(pivotX, pivotY);
+        ctx.rotate((exitRotDeg * Math.PI) / 180);
+        ctx.translate(-pivotX, -pivotY);
 
         ctx.globalAlpha = 0.96;
         ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
@@ -352,6 +362,7 @@
         hazeGrad.addColorStop(1, "rgba(253, 249, 240, 0.12)");
         ctx.fillStyle = hazeGrad;
         ctx.fillRect(exitX, exitY, exitW, exitH);
+
         ctx.restore();
       }
 
