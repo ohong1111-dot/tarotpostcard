@@ -60,7 +60,7 @@
       max-width: 780px;
     }
 
-    /* 人類圖載具規格前置設定選單 */
+    /* 人類圖載具規格前置選單 */
     .hd-selector-box {
       width: 100%;
       background: var(--card-bg);
@@ -324,7 +324,6 @@
   </header>
 
   <div class="main-container">
-    <!-- 人類圖規格設定欄位 -->
     <div class="hd-selector-box">
       <h3>設定個人人類圖載具規格</h3>
       <div class="hd-fields">
@@ -342,8 +341,6 @@
           <select id="selectHdAuth">
             <option value="sacral">薦骨權威（Sacral）</option>
             <option value="solar">情緒中心權威（Solar Plexus）</option>
-            <option value="splenic">脾／直覺權威（Splenic）</option>
-            <option value="ego">意志力／心中心權威（Ego）</option>
           </select>
         </div>
       </div>
@@ -400,7 +397,6 @@
     const canvas = document.getElementById('postcardCanvas');
     const ctx = canvas.getContext('2d');
 
-    // 人類圖內在權威聯動選單
     const AUTH_CONFIG = {
       generator: [
         { val: "sacral", text: "薦骨權威（Sacral）" },
@@ -410,7 +406,7 @@
         { val: "solar", text: "情緒中心權威（Solar Plexus）" },
         { val: "splenic", text: "脾／直覺權威（Splenic）" },
         { val: "self", text: "自我投射權威（Self-Projected）" },
-        { val: "mental", text: "無內在權威／環境權威（Mental）" }
+        { val: "mental", text: "環境／無內在權威（Mental）" }
       ],
       manifestor: [
         { val: "solar", text: "情緒中心權威（Solar Plexus）" },
@@ -428,7 +424,6 @@
       authSelect.innerHTML = AUTH_CONFIG[type].map(a => `<option value="${a.val}">${a.text}</option>`).join('');
     }
 
-    // 78 張標準偉特牌庫
     const TAROT_DECK = [
       { name: "愚者", elem: "air" }, { name: "魔術師", elem: "air" }, { name: "女祭司", elem: "water" },
       { name: "皇后", elem: "earth" }, { name: "皇帝", elem: "fire" }, { name: "教皇", elem: "earth" },
@@ -453,23 +448,24 @@
       });
     });
 
+    // 嚴格對齊硬碟檔案清單中的 20 個真實檔案名稱
     const ASSET_CONFIG = {
       skies: {
         sky_gold: { name: "暮日晨光", tone: "#f5d77f", elem: "fire" },
-        sky_grey: { name: "冷冽長空", tone: "#cfd6df", elem: "air" },
+        sky_sunset: { name: "落日餘暉", tone: "#e69c6d", elem: "air" },
         sky_night: { name: "深藍子夜", tone: "#1e293b", elem: "water" },
         sky_storm: { name: "風暴前夕", tone: "#94a3b8", elem: "earth" }
       },
       exits: {
         exit_arch: { name: "雙塔石門", elem: "earth", guide: "需等待清晰的外在訊號方可穿越" },
         exit_bridge: { name: "跨谷木橋", elem: "fire", guide: "跨越鴻溝，勿向過去的沈沒成本回望" },
-        exit_gate: { name: "城邦閘口", elem: "air", guide: "建立明確的物理邊界，停止為他人非自己承擔責任" },
-        exit_path: { name: "林間小徑", elem: "water", guide: "放慢步伐讓路徑自現，切忌焦慮加速" }
+        exit_sea: { name: "汪洋出口", elem: "water", guide: "隨波順應大流，讓動能引領你抵達開闊水域" },
+        exit_path: { name: "林間小徑", elem: "air", guide: "放慢步伐讓路徑自現，切忌焦慮加速" }
       },
       grounds: {
         ground_cliff: { name: "荒蕪峭壁", baseTone: "#9e9484", elem: "fire", env: "高地懸空，考驗對真實地心引力的信任" },
-        ground_desert: { name: "蒼茫荒漠", baseTone: "#c2ab7c", elem: "earth", env: "資源單一化，正是關閉外界干擾、回歸核心本質之時" },
-        ground_ruin: { name: "殘垣基底", baseTone: "#8b8377", elem: "air", env: "舊有防禦機制已碎裂，不必急於重建，席地安坐即可" },
+        ground_hill: { name: "蒼茫起伏山丘", baseTone: "#a69b7c", elem: "earth", env: "地形平緩連綿，需要耐力穩紮穩打" },
+        ground_terrace: { name: "石階高台", baseTone: "#8b8377", elem: "air", env: "舊有防禦結構穩固，可居高臨下審視全局" },
         ground_water: { name: "幽暗水岸", baseTone: "#4b6068", elem: "water", env: "情緒水流暗湧，唯有讓體感沉澱方能辨別方向" }
       },
       figures: {
@@ -506,29 +502,6 @@
       });
     }
 
-    function createTransparentCanvas(img) {
-      if (!img) return null;
-      const offCanvas = document.createElement('canvas');
-      offCanvas.width = img.naturalWidth || img.width;
-      offCanvas.height = img.naturalHeight || img.height;
-      const offCtx = offCanvas.getContext('2d');
-      offCtx.drawImage(img, 0, 0);
-
-      try {
-        const imgData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
-        const data = imgData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          if (data[i] > 230 && data[i + 1] > 230 && data[i + 2] > 230) {
-            data[i + 3] = 0;
-          }
-        }
-        offCtx.putImageData(imgData, 0, 0);
-        return offCanvas;
-      } catch (e) {
-        return img;
-      }
-    }
-
     let currentDrawData = null;
 
     async function runCelticCrossSystem() {
@@ -536,11 +509,9 @@
       btn.disabled = true;
       btn.innerText = "感應塞爾特十卡中...";
 
-      // 讀取使用者設定的人類圖載具規格
       const userType = document.getElementById('selectHdType').value;
       const userAuth = document.getElementById('selectHdAuth').value;
 
-      // 塞爾特十字 10 張牌
       const shuffled = [...TAROT_DECK].sort(() => 0.5 - Math.random());
       const cCards = shuffled.slice(0, 10);
 
@@ -557,15 +528,14 @@
         { pos: "10. 最終結果", card: cCards[9] }
       ];
 
-      // 映射 20 個元素
       const skyElem = cCards[9].elem || cCards[4].elem;
       const skyKey = Object.keys(ASSET_CONFIG.skies).find(k => ASSET_CONFIG.skies[k].elem === skyElem) || "sky_gold";
 
       const exitElem = cCards[5].elem || cCards[3].elem;
-      const exitKey = Object.keys(ASSET_CONFIG.exits).find(k => ASSET_CONFIG.exits[k].elem === exitElem) || "exit_gate";
+      const exitKey = Object.keys(ASSET_CONFIG.exits).find(k => ASSET_CONFIG.exits[k].elem === exitElem) || "exit_arch";
 
       const groundElem = cCards[1].elem || cCards[7].elem || cCards[0].elem;
-      const groundKey = Object.keys(ASSET_CONFIG.grounds).find(k => ASSET_CONFIG.grounds[k].elem === groundElem) || "ground_desert";
+      const groundKey = Object.keys(ASSET_CONFIG.grounds).find(k => ASSET_CONFIG.grounds[k].elem === groundElem) || "ground_hill";
 
       const figElem = cCards[6].elem || cCards[8].elem;
       const figKey = Object.keys(ASSET_CONFIG.figures).find(k => ASSET_CONFIG.figures[k].elem === figElem) || "figure_stand";
@@ -591,25 +561,21 @@
       btn.innerText = "重新感應十卡・校準地景";
     }
 
+    // 多色套版印刷渲染引擎（依據 1200x800 基準滿版套印）
     async function renderLandscape(data) {
       const W = canvas.width;  // 1200
       const H = canvas.height; // 800
 
       ctx.clearRect(0, 0, W, H);
 
-      const [rawSky, rawExit, rawGround, rawFigure] = await Promise.all([
+      const [imgSky, imgGround, imgExit, imgFigure] = await Promise.all([
         loadImage(`assets/skies/${data.sky}.png`),
-        loadImage(`assets/exits/${data.exit}.png`),
         loadImage(`assets/grounds/${data.ground}.png`),
+        loadImage(`assets/exits/${data.exit}.png`),
         loadImage(`assets/figures/${data.figure}.png`)
       ]);
 
-      const imgSky = rawSky;
-      const imgExit = createTransparentCanvas(rawExit);
-      const imgGround = rawGround;
-      const imgFigure = createTransparentCanvas(rawFigure);
-
-      // 1. 底紙羊皮紙留白
+      // 1. 底紙羊皮紙
       ctx.fillStyle = "#fdf9f0";
       ctx.fillRect(0, 0, W, H);
 
@@ -622,7 +588,7 @@
       ctx.rect(margin, margin, innerW, innerH);
       ctx.clip();
 
-      // 2. 遠景：天空底色
+      // 版 1：天候色版（滿版鋪底）
       ctx.globalCompositeOperation = 'source-over';
       if (imgSky) {
         ctx.drawImage(imgSky, margin, margin, innerW, innerH);
@@ -634,77 +600,33 @@
         ctx.fillRect(margin, margin, innerW, innerH);
       }
 
-      // 3. 遠方生路出口（微縮遠景，座落右側遠方地平線）
+      // 版 2：立足地貌版（滿版套印承接）
+      if (imgGround) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.drawImage(imgGround, margin, margin, innerW, innerH);
+        ctx.restore();
+      }
+
+      // 版 3：遠方生路出口版（右後方透視套印）
       if (imgExit) {
         ctx.save();
-        ctx.globalAlpha = 0.82;
         ctx.globalCompositeOperation = 'multiply';
-        const exitW = innerW * 0.26;
-        const exitH = innerH * 0.46;
-        const exitX = margin + innerW - exitW - (innerW * 0.06);
-        const exitY = margin + (innerH * 0.26);
-        ctx.drawImage(imgExit, exitX, exitY, exitW, exitH);
+        ctx.drawImage(imgExit, margin, margin, innerW, innerH);
         ctx.restore();
       }
 
-      // 4. 中景至近景：立足地貌（強制接地，消除漂浮島問題）
-      const groundInfo = ASSET_CONFIG.grounds[data.ground];
-      const groundH = innerH * 0.54;
-      const groundTopY = margin + innerH - groundH;
-
-      ctx.save();
-      const baseGrad = ctx.createLinearGradient(0, groundTopY, 0, margin + innerH);
-      baseGrad.addColorStop(0, "rgba(235, 226, 208, 0)");
-      baseGrad.addColorStop(0.35, "rgba(210, 198, 175, 0.6)");
-      baseGrad.addColorStop(1, groundInfo.baseTone);
-      ctx.fillStyle = baseGrad;
-      ctx.fillRect(margin, groundTopY, innerW, groundH);
-      ctx.restore();
-
-      if (imgGround) {
-        const gCanvas = document.createElement('canvas');
-        gCanvas.width = innerW;
-        gCanvas.height = groundH;
-        const gCtx = gCanvas.getContext('2d');
-
-        gCtx.drawImage(imgGround, 0, 0, innerW, groundH);
-
-        gCtx.globalCompositeOperation = 'destination-in';
-        const fadeGrad = gCtx.createLinearGradient(0, 0, 0, groundH * 0.40);
-        fadeGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        fadeGrad.addColorStop(1, 'rgba(0, 0, 0, 1)');
-        gCtx.fillStyle = fadeGrad;
-        gCtx.fillRect(0, 0, innerW, groundH);
-
-        ctx.save();
-        ctx.globalCompositeOperation = 'multiply';
-        ctx.drawImage(gCanvas, margin, groundTopY, innerW, groundH);
-        ctx.restore();
-      }
-
-      // 5. 主角：旅人剪影（固定在左側 16%，雙腳踩實近景地面）
-      const figH = innerH * 0.36;
-      const figW = figH * 0.68;
-      const figX = margin + (innerW * 0.16);
-      const figY = margin + innerH - figH - 14;
-
-      ctx.save();
+      // 版 4：旅人姿態黑線版（左近景咬印）
       if (imgFigure) {
         ctx.save();
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.drawImage(imgFigure, figX, figY, figW, figH);
-        ctx.restore();
-
-        ctx.save();
         ctx.globalCompositeOperation = 'multiply';
-        ctx.drawImage(imgFigure, figX, figY, figW, figH);
+        ctx.drawImage(imgFigure, margin, margin, innerW, innerH);
         ctx.restore();
       }
-      ctx.restore();
 
-      ctx.restore(); // 結束裁切
+      ctx.restore(); // 結束遮罩
 
-      // 6. 1909 偉特古典雙層框線
+      // 1909 偉特古典雙層框線
       ctx.strokeStyle = "#2b261f";
       ctx.lineWidth = 3;
       ctx.strokeRect(margin, margin, innerW, innerH);
@@ -712,7 +634,7 @@
       ctx.lineWidth = 1;
       ctx.strokeRect(margin - 6, margin - 6, innerW + 12, innerH + 12);
 
-      // 7. 底部情境銘刻文字
+      // 底部情境銘刻文字
       ctx.fillStyle = "#3e382f";
       ctx.font = "italic 20px 'Times New Roman', serif";
       ctx.textAlign = "center";
@@ -720,7 +642,6 @@
       ctx.fillText(`— ${sceneTitle} —`, W / 2, H - 18);
     }
 
-    // 生成結合「使用者設定的人類圖規格」與「塞爾特十卡」的 300 字深度報告
     function updateInfoCard(data) {
       const card = document.getElementById('cardInfo');
       const badge = document.getElementById('hdBadge');
@@ -734,7 +655,6 @@
       const fig = ASSET_CONFIG.figures[data.figure];
       const tool = ASSET_CONFIG.tools[data.tool];
 
-      // 人類圖決策矩陣指引
       const HD_SPECS = {
         generator: {
           name: "生產者 / 原型載具",
@@ -778,7 +698,6 @@
       badge.innerText = `YOUR SPEC：${userSpec.name}`;
       title.innerText = `出廠地景定位：${ground.name} × ${sky.name}`;
 
-      // 列出 10 張牌微縮資訊
       grid.innerHTML = data.celtic.map(c => `
         <div class="celtic-item">
           <span>${c.pos}</span>
@@ -786,7 +705,6 @@
         </div>
       `).join('');
 
-      // 300字深度出廠手冊
       text.innerHTML = `
         <div style="background: rgba(0,0,0,0.3); border-left: 3px solid var(--accent-gold); padding: 12px 14px; margin-bottom: 18px; font-size: 0.85rem; line-height: 1.6;">
           <strong style="color: var(--accent-gold);">【你的專屬出廠規格】</strong><br>
@@ -833,7 +751,14 @@
       alert(`【微付費買斷確認】\n金額：NT$ 88\n發票代管：${invoiceMsg}\n\n已成功解鎖高解析原印明信片與專屬信物卡！`);
 
       const tool = ASSET_CONFIG.tools[currentDrawData.tool];
-      document.getElementById('toolImg').src = `assets/tools/${currentDrawData.tool}.png`;
+      const toolImgEl = document.getElementById('toolImg');
+      
+      toolImgEl.onerror = function() {
+        this.onerror = null;
+        this.src = `https://api.iconify.design/game-icons:pentacle.svg?color=%23c5a059`;
+      };
+      toolImgEl.src = `assets/tools/${currentDrawData.tool}.png`;
+
       document.getElementById('toolTitle').innerText = `解鎖隨身法器：${tool.name}`;
       document.getElementById('toolDetail').innerHTML = `<strong>【核心屬性】</strong>${tool.attr}<br><strong>【出廠使用法則】</strong>${tool.guide}`;
 
