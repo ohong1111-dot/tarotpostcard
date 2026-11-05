@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>偉特地景・生版畫視覺校調儀（工程儀表板）</title>
+  <title>偉特地景・生版畫視覺校調儀</title>
   <style>
     :root {
       --bg-wood: #181614;
@@ -70,7 +70,7 @@
 
     canvas {
       display: block;
-      background-color: #2b2620;
+      background-color: #e8e0cc;
       max-width: 100%;
       height: auto;
     }
@@ -260,16 +260,16 @@
         </div>
       </div>
 
-      <!-- 2. 生路出口 軸線校準 -->
+      <!-- 2. 生路出口 軸向定位 -->
       <div class="section-title">生路出口 (Exit) 軸向定位</div>
       <div class="slider-row">
         <div class="control-group">
-          <label>水平 X 軸偏移 <span class="val" id="valExitX">-44px</span></label>
-          <input type="range" id="rngExitX" min="-400" max="400" step="1" value="-44">
+          <label>出口 X 軸位移 <span class="val" id="valExitX">0px</span></label>
+          <input type="range" id="rngExitX" min="-400" max="400" step="1" value="0">
         </div>
         <div class="control-group">
-          <label>垂直 Y 軸偏移 <span class="val" id="valExitY">-58px</span></label>
-          <input type="range" id="rngExitY" min="-300" max="300" step="1" value="-58">
+          <label>出口 Y 軸位移 <span class="val" id="valExitY">0px</span></label>
+          <input type="range" id="rngExitY" min="-300" max="300" step="1" value="0">
         </div>
         <div class="control-group">
           <label>等比縮放 <span class="val" id="valExitScale">1.00x</span></label>
@@ -281,41 +281,53 @@
         </div>
       </div>
 
-      <!-- 3. 地貌與旅人 軸線校準 -->
-      <div class="section-title">地貌 (Ground) 與 旅人 (Figure) 軸向定位</div>
+      <!-- 3. 地貌 軸向定位 -->
+      <div class="section-title">地貌 (Ground) 軸向定位</div>
       <div class="slider-row">
         <div class="control-group">
           <label>地貌 寬度比例 <span class="val" id="valGroundW">1.00</span></label>
           <input type="range" id="rngGroundW" min="0.7" max="1.4" step="0.01" value="1.00">
         </div>
         <div class="control-group">
-          <label>地貌 沉降高度 <span class="val" id="valGroundH">0.52</span></label>
+          <label>地貌 高度延展 <span class="val" id="valGroundH">0.52</span></label>
           <input type="range" id="rngGroundH" min="0.3" max="0.8" step="0.01" value="0.52">
         </div>
         <div class="control-group">
-          <label>旅人 X 軸位置 <span class="val" id="valFigX">0.08</span></label>
-          <input type="range" id="rngFigX" min="0.01" max="0.5" step="0.005" value="0.08">
+          <label>地貌 底部微調 (正值往下壓) <span class="val" id="valGroundY">0px</span></label>
+          <input type="range" id="rngGroundY" min="-30" max="60" step="1" value="0">
+        </div>
+      </div>
+
+      <!-- 4. 旅人 軸向定位 -->
+      <div class="section-title">旅人 (Figure) 軸向定位</div>
+      <div class="slider-row">
+        <div class="control-group">
+          <label>旅人 X 軸位置 <span class="val" id="valFigX">0.080</span></label>
+          <input type="range" id="rngFigX" min="0.01" max="0.5" step="0.005" value="0.080">
         </div>
         <div class="control-group">
-          <label>旅人 Y 軸錨點 <span class="val" id="valFigY">0.90</span></label>
-          <input type="range" id="rngFigY" min="0.7" max="1.0" step="0.005" value="0.90">
+          <label>旅人 Y 軸錨點 <span class="val" id="valFigY">0.900</span></label>
+          <input type="range" id="rngFigY" min="0.7" max="1.0" step="0.005" value="0.900">
+        </div>
+        <div class="control-group">
+          <label>旅人 尺寸比例 <span class="val" id="valFigScale">0.38</span></label>
+          <input type="range" id="rngFigScale" min="0.25" max="0.55" step="0.01" value="0.38">
         </div>
       </div>
 
       <div class="toggles-and-actions">
         <label class="checkbox-label">
-          <input type="checkbox" id="chkGuide" checked>
-          顯示水平/垂直中心參考線與瞄準刻度
+          <input type="checkbox" id="chkGuide">
+          顯示輔助參考線與準星
         </label>
 
         <div class="btn-row">
-          <button id="btnResetPair" class="primary">套用預設值</button>
-          <button id="btnCopyCoords">複製當前數值</button>
+          <button id="btnCopyCoords" class="primary">複製當前數值</button>
         </div>
       </div>
 
       <div class="coords-output" id="outputCoords">
-        Ground: [W:1.00, H:0.52] | Exit: [X:-44, Y:-58, Scale:1.00, Rot:0°] | Fig: [X:0.08, Y:0.90]
+        Ground: [W:1.00, H:0.52, Y:0] | Exit: [X:0, Y:0, Scale:1.00, Rot:0°] | Fig: [X:0.080, Y:0.900, S:0.38]
       </div>
     </div>
   </div>
@@ -329,19 +341,6 @@
       'sky_sunset': 'rgba(224, 110, 60, 0.12)',
       'sky_storm': 'rgba(80, 85, 90, 0.15)',
       'sky_night': 'rgba(30, 45, 80, 0.16)'
-    };
-
-    const CALIBRATION_PRESETS = {
-      'ground_hill+exit_bridge':    { x: 0,   y: 56,  scale: 1.00, rot: 0 },
-      'ground_water+exit_stream':   { x: 200, y: 56,  scale: 1.00, rot: 0 },
-      'ground_terrace+exit_stream': { x: 230, y: -58, scale: 1.00, rot: 0 },
-      'ground_cliff+exit_arch':     { x: 8,   y: -58, scale: 1.00, rot: 0 },
-      'ground_cliff+exit_path':     { x: 142, y: -58, scale: 1.00, rot: 0 },
-      'ground_terrace+exit_arch':   { x: -44, y: -58, scale: 1.00, rot: 0 },
-      'ground_terrace+exit_bridge': { x: 18,  y: -32, scale: 1.00, rot: 0 },
-      'ground_cliff+exit_bridge':   { x: 0,   y: -30, scale: 1.00, rot: 0 },
-      'ground_hill+exit_path':      { x: 80,  y: 0,   scale: 1.00, rot: 0 },
-      'ground_water+exit_arch':     { x: 0,   y: 0,   scale: 1.00, rot: 0 }
     };
 
     const imageCache = {};
@@ -382,8 +381,11 @@
 
     const rngGroundW = document.getElementById('rngGroundW');
     const rngGroundH = document.getElementById('rngGroundH');
+    const rngGroundY = document.getElementById('rngGroundY');
+
     const rngFigX = document.getElementById('rngFigX');
     const rngFigY = document.getElementById('rngFigY');
+    const rngFigScale = document.getElementById('rngFigScale');
 
     const valExitX = document.getElementById('valExitX');
     const valExitY = document.getElementById('valExitY');
@@ -392,31 +394,15 @@
 
     const valGroundW = document.getElementById('valGroundW');
     const valGroundH = document.getElementById('valGroundH');
+    const valGroundY = document.getElementById('valGroundY');
+
     const valFigX = document.getElementById('valFigX');
     const valFigY = document.getElementById('valFigY');
+    const valFigScale = document.getElementById('valFigScale');
 
     const chkGuide = document.getElementById('chkGuide');
     const outputCoords = document.getElementById('outputCoords');
-    const btnResetPair = document.getElementById('btnResetPair');
     const btnCopyCoords = document.getElementById('btnCopyCoords');
-
-    function applyBestPreset(silent = false) {
-      const pairKey = `${selGround.value}+${selExit.value}`;
-      const preset = CALIBRATION_PRESETS[pairKey];
-      if (preset) {
-        rngExitX.value = preset.x;
-        rngExitY.value = preset.y;
-        rngExitScale.value = preset.scale;
-        rngExitRot.value = preset.rot;
-      } else if (!silent) {
-        rngExitX.value = 0;
-        rngExitY.value = 0;
-        rngExitScale.value = 1.00;
-        rngExitRot.value = 0;
-      }
-      updateLabels();
-      liveRender();
-    }
 
     function updateLabels() {
       valExitX.textContent = `${rngExitX.value}px`;
@@ -426,13 +412,16 @@
 
       valGroundW.textContent = parseFloat(rngGroundW.value).toFixed(2);
       valGroundH.textContent = parseFloat(rngGroundH.value).toFixed(2);
+      valGroundY.textContent = `${rngGroundY.value}px`;
+
       valFigX.textContent = parseFloat(rngFigX.value).toFixed(3);
       valFigY.textContent = parseFloat(rngFigY.value).toFixed(3);
+      valFigScale.textContent = parseFloat(rngFigScale.value).toFixed(2);
 
       outputCoords.textContent = 
-        `Ground: [W:${valGroundW.textContent}, H:${valGroundH.textContent}] | ` +
+        `Ground: [W:${valGroundW.textContent}, H:${valGroundH.textContent}, Y:${rngGroundY.value}] | ` +
         `Exit: [X:${rngExitX.value}, Y:${rngExitY.value}, Scale:${valExitScale.textContent.replace('x','')}, Rot:${rngExitRot.value}°] | ` +
-        `Fig: [X:${valFigX.textContent}, Y:${valFigY.textContent}]`;
+        `Fig: [X:${valFigX.textContent}, Y:${valFigY.textContent}, S:${valFigScale.textContent}]`;
     }
 
     async function liveRender() {
@@ -448,10 +437,13 @@
 
       const gW = parseFloat(rngGroundW.value);
       const gH = parseFloat(rngGroundH.value);
+      const gYOffset = parseFloat(rngGroundY.value);
+
       const figX = parseFloat(rngFigX.value);
       const figY = parseFloat(rngFigY.value);
+      const figScale = parseFloat(rngFigScale.value);
 
-      // 直接載入原圖
+      // 直接載入原圖，絕無任何破壞性演算法
       const [imgSky, imgExit, imgGround, imgFigure] = await Promise.all([
         loadImage(`/assets/skies/${sky}.png`),
         loadImage(`/assets/exits/${exit}.png`),
@@ -471,7 +463,7 @@
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip();
+      ctx.clip(); // 鎖定在卡面內框
 
       // 1. 天空
       if (imgSky) {
@@ -486,7 +478,7 @@
         ctx.restore();
       }
 
-      // 2. 出口
+      // 2. 出口（退後）
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -501,15 +493,15 @@
         ctx.restore();
       }
 
-      // 3. 地貌
+      // 3. 地貌前景（錨定底框，+3px 壓死底邊避免任何隙縫，再加上手動 Y 位移）
       if (imgGround) {
         ctx.save();
-       // 永遠咬死底邊的寫法：
-const groundDrawW = innerW * gW;
-const groundDrawH = innerH * gH;
-// 底部直接對齊內框底線 (margin + innerH)，再多沉 2px 徹底封死縫隙
-const groundDrawY = (margin + innerH) - groundDrawH + 2; 
-ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
+        const groundDrawW = innerW * gW;
+        const groundDrawH = innerH * gH;
+        const groundDrawY = (margin + innerH) - groundDrawH + 3 + gYOffset;
+        ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
+        ctx.restore();
+      }
 
       // 4. 古典環境天光浸染 (Multiply)
       if (SKY_TINTS && SKY_TINTS[sky]) {
@@ -520,10 +512,10 @@ ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
         ctx.restore();
       }
 
-      // 5. 旅人立像
+      // 5. 旅人姿態
       if (imgFigure) {
         ctx.save();
-        const figH_px = innerH * 0.38;
+        const figH_px = innerH * figScale;
         const figAspect = (imgFigure.naturalWidth / imgFigure.naturalHeight) || 0.6;
         const figW_px = figH_px * figAspect;
         const figPosX = margin + innerW * figX;
@@ -534,7 +526,7 @@ ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
 
       ctx.restore();
 
-      // 6. 1909 偉特雙黑線框
+      // 6. 1909 偉特雙黑框
       ctx.save();
       ctx.strokeStyle = '#2b261f';
       ctx.lineWidth = 4;
@@ -543,26 +535,20 @@ ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
       ctx.strokeRect(margin - 8, margin - 8, innerW + 16, innerH + 16);
       ctx.restore();
 
-      // 7. 水平/垂直工程瞄準輔助線 (若有勾選)
+      // 7. 輔助線與準星 (勾選時顯示)
       if (chkGuide.checked) {
         ctx.save();
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
 
-        // 水平中心線 (青色)
         ctx.strokeStyle = 'rgba(78, 205, 196, 0.7)';
         ctx.beginPath();
         ctx.moveTo(margin, canvas.height / 2);
         ctx.lineTo(margin + innerW, canvas.height / 2);
-        ctx.stroke();
-
-        // 垂直中心線 (青色)
-        ctx.beginPath();
         ctx.moveTo(canvas.width / 2, margin);
         ctx.lineTo(canvas.width / 2, margin + innerH);
         ctx.stroke();
 
-        // 出口錨點十字準星 (紅色)
         const curExitAnchorX = margin + innerW * 0.80 + exitX;
         const curExitAnchorY = margin + innerH * 0.75 + exitY;
         ctx.strokeStyle = 'rgba(255, 68, 68, 0.9)';
@@ -579,35 +565,29 @@ ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
       }
     }
 
-    [selGround, selExit].forEach(el => {
-      el.addEventListener('change', () => applyBestPreset(false));
-    });
-
-    [selSky, selFigure].forEach(el => {
+    [selSky, selGround, selExit, selFigure].forEach(el => {
       el.addEventListener('change', liveRender);
     });
 
     chkGuide.addEventListener('change', liveRender);
 
-    [rngExitX, rngExitY, rngExitScale, rngExitRot, rngGroundW, rngGroundH, rngFigX, rngFigY].forEach(slider => {
+    [rngExitX, rngExitY, rngExitScale, rngExitRot, rngGroundW, rngGroundH, rngGroundY, rngFigX, rngFigY, rngFigScale].forEach(slider => {
       slider.addEventListener('input', () => {
         updateLabels();
         liveRender();
       });
     });
 
-    btnResetPair.addEventListener('click', () => applyBestPreset(false));
-
     btnCopyCoords.addEventListener('click', () => {
       navigator.clipboard.writeText(outputCoords.textContent).then(() => {
         const orig = btnCopyCoords.textContent;
-        btnCopyCoords.textContent = '已複製到剪貼簿！';
+        btnCopyCoords.textContent = '已複製！';
         setTimeout(() => btnCopyCoords.textContent = orig, 1500);
       });
     });
 
     updateLabels();
-    applyBestPreset(true);
+    liveRender();
   </script>
 </body>
 </html>
