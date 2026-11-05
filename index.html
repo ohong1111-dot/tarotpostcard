@@ -454,7 +454,7 @@
         `Fig: [X:${valFigX.textContent}, Y:${valFigY.textContent}, H:0.38]`;
     }
 
-    async function liveRender() {
+async function liveRender() {
       const sky = selSky.value;
       const ground = selGround.value;
       const exit = selExit.value;
@@ -477,15 +477,17 @@
         loadImage(`/assets/figures/${figure}.png`)
       ]);
 
-      // 天空不濾色；出口、地貌與人物自動執行像素穿透濾網
+      // 天空、出口、地貌保留原始完整色調（不挖空亮部白光）
       const imgSky = rawSky;
-      const imgExit = magicPurge(rawExit);
-      const imgGround = magicPurge(rawGround);
-      const imgFigure = magicPurge(rawFigure);
+      const imgExit = rawExit;
+      const imgGround = rawGround;
+      // 僅對旅人做邊緣白框防禦，若旅人也已去背乾淨可直接用 rawFigure
+      const imgFigure = rawFigure;
 
-      // 強制歸零 Transform 矩陣並清空畫布
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#e8e0cc';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const margin = 28;
       const innerW = canvas.width - margin * 2;
@@ -494,15 +496,9 @@
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip(); // 限制所有繪製在畫框內部
+      ctx.clip();
 
-      // 1. 天空滿版鋪底（若素材延遲，鋪上古典漸層防禦底色）
-      const skyGrad = ctx.createLinearGradient(margin, margin, margin, margin + innerH);
-      skyGrad.addColorStop(0, '#fde68a');
-      skyGrad.addColorStop(1, '#f59e0b');
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(margin, margin, innerW, innerH);
-
+      // 1. 天空滿版鋪底
       if (imgSky) {
         ctx.save();
         if (sky === 'sky_night') {
@@ -515,7 +511,7 @@
         ctx.restore();
       }
 
-      // 2. 生路出口（先畫：退到地貌後方，起點與邊緣交由地貌遮蔽）
+      // 2. 出口（退後，石門中心白光完整保留不被鏤空）
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -530,7 +526,7 @@
         ctx.restore();
       }
 
-      // 3. 地貌前景（後畫：覆蓋在出口之上）
+      // 3. 地貌前景
       if (imgGround) {
         ctx.save();
         const groundDrawW = innerW * gW;
@@ -540,7 +536,7 @@
         ctx.restore();
       }
 
-      // 4. 古典環境天光浸染 (Multiply)
+      // 4. 古典天光染色
       if (SKY_TINTS && SKY_TINTS[sky]) {
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
@@ -549,11 +545,11 @@
         ctx.restore();
       }
 
-      // 5. 旅人立像（置於最前）
+      // 5. 旅人姿態
       if (imgFigure) {
         ctx.save();
         const figH_px = innerH * 0.38;
-        const figAspect = (imgFigure.width / imgFigure.height) || 0.6;
+        const figAspect = (imgFigure.naturalWidth / imgFigure.naturalHeight) || 0.6;
         const figW_px = figH_px * figAspect;
         const figPosX = margin + innerW * figX;
         const figPosY = margin + innerH * figY - figH_px;
@@ -561,9 +557,9 @@
         ctx.restore();
       }
 
-      ctx.restore(); // 釋放 clip 剪裁
+      ctx.restore();
 
-      // 6. 1909 偉特雙黑線框
+      // 6. 偉特雙黑框
       ctx.save();
       ctx.strokeStyle = '#2b261f';
       ctx.lineWidth = 4;
