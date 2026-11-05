@@ -504,12 +504,12 @@
       // 3. 地貌
       if (imgGround) {
         ctx.save();
-        const groundDrawW = innerW * gW;
-        const groundDrawH = innerH * gH;
-        const groundDrawY = margin + innerH - groundDrawH;
-        ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
-        ctx.restore();
-      }
+       // 永遠咬死底邊的寫法：
+const groundDrawW = innerW * gW;
+const groundDrawH = innerH * gH;
+// 底部直接對齊內框底線 (margin + innerH)，再多沉 2px 徹底封死縫隙
+const groundDrawY = (margin + innerH) - groundDrawH + 2; 
+ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
 
       // 4. 古典環境天光浸染 (Multiply)
       if (SKY_TINTS && SKY_TINTS[sky]) {
