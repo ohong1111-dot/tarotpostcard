@@ -208,7 +208,7 @@
 
   <header>
     <h1>偉特地景・生版畫視覺校調儀</h1>
-    <p>水平軸 / 垂直軸 / 咬合點 原始座標工程儀表板</p>
+    <p>16 組全地貌 × 出口 × 人物 完美咬合工程總成</p>
   </header>
 
   <div class="workbench">
@@ -294,7 +294,7 @@
         </div>
         <div class="control-group">
           <label>地貌 底部微調 (正值往下壓) <span class="val" id="valGroundY">0px</span></label>
-          <input type="range" id="rngGroundY" min="-30" max="60" step="1" value="0">
+          <input type="range" id="rngGroundY" min="-30" max="80" step="1" value="0">
         </div>
       </div>
 
@@ -303,11 +303,11 @@
       <div class="slider-row">
         <div class="control-group">
           <label>旅人 X 軸位置 <span class="val" id="valFigX">0.080</span></label>
-          <input type="range" id="rngFigX" min="0.01" max="0.5" step="0.005" value="0.080">
+          <input type="range" id="rngFigX" min="0.005" max="0.5" step="0.005" value="0.080">
         </div>
         <div class="control-group">
           <label>旅人 Y 軸錨點 <span class="val" id="valFigY">0.900</span></label>
-          <input type="range" id="rngFigY" min="0.7" max="1.0" step="0.005" value="0.900">
+          <input type="range" id="rngFigY" min="0.6" max="1.0" step="0.005" value="0.900">
         </div>
         <div class="control-group">
           <label>旅人 尺寸比例 <span class="val" id="valFigScale">0.38</span></label>
@@ -322,7 +322,8 @@
         </label>
 
         <div class="btn-row">
-          <button id="btnCopyCoords" class="primary">複製當前數值</button>
+          <button id="btnResetPair" class="primary">重新套用本組合黃金值</button>
+          <button id="btnCopyCoords">複製當前數值</button>
         </div>
       </div>
 
@@ -341,6 +342,97 @@
       'sky_sunset': 'rgba(224, 110, 60, 0.12)',
       'sky_storm': 'rgba(80, 85, 90, 0.15)',
       'sky_night': 'rgba(30, 45, 80, 0.16)'
+    };
+
+    // 16 組完整黃金座標數據庫
+    const CALIBRATION_PRESETS = {
+      // 1. 石階高台 (ground_terrace)
+      'ground_terrace+exit_arch': {
+        exit: { x: 2, y: -69, scale: 0.88, rot: 0 },
+        ground: { w: 1.00, h: 0.52, y: 56 },
+        fig: { x: 0.080, y: 0.900, scale: 0.38 }
+      },
+      'ground_terrace+exit_bridge': {
+        exit: { x: 29, y: -44, scale: 0.88, rot: 0 },
+        ground: { w: 1.00, h: 0.52, y: 56 },
+        fig: { x: 0.080, y: 0.900, scale: 0.38 }
+      },
+      'ground_terrace+exit_path': {
+        exit: { x: 29, y: -44, scale: 0.88, rot: 0 },
+        ground: { w: 1.00, h: 0.52, y: 56 },
+        fig: { x: 0.080, y: 0.900, scale: 0.38 }
+      },
+      'ground_terrace+exit_stream': {
+        exit: { x: 197, y: 77, scale: 0.88, rot: 4.5 },
+        ground: { w: 1.00, h: 0.52, y: 56 },
+        fig: { x: 0.080, y: 0.900, scale: 0.38 }
+      },
+
+      // 2. 起伏山丘 (ground_hill)
+      'ground_hill+exit_arch': {
+        exit: { x: 15, y: 0, scale: 0.84, rot: 0 },
+        ground: { w: 1.01, h: 0.52, y: 24 },
+        fig: { x: 0.080, y: 0.830, scale: 0.38 }
+      },
+      'ground_hill+exit_bridge': {
+        exit: { x: 39, y: 0, scale: 0.84, rot: 0 },
+        ground: { w: 1.01, h: 0.52, y: 24 },
+        fig: { x: 0.080, y: 0.830, scale: 0.38 }
+      },
+      'ground_hill+exit_path': {
+        exit: { x: 39, y: 0, scale: 0.84, rot: 0 },
+        ground: { w: 1.01, h: 0.52, y: 24 },
+        fig: { x: 0.080, y: 0.830, scale: 0.38 }
+      },
+      'ground_hill+exit_stream': {
+        exit: { x: 207, y: 117, scale: 0.84, rot: 0 },
+        ground: { w: 1.01, h: 0.52, y: 24 },
+        fig: { x: 0.080, y: 0.830, scale: 0.38 }
+      },
+
+      // 3. 荒蕪峭壁 (ground_cliff)
+      'ground_cliff+exit_arch': {
+        exit: { x: 42, y: 1, scale: 0.84, rot: 0 },
+        ground: { w: 1.02, h: 0.52, y: 57 },
+        fig: { x: 0.070, y: 0.715, scale: 0.38 }
+      },
+      'ground_cliff+exit_bridge': {
+        exit: { x: 42, y: 1, scale: 0.84, rot: 0 },
+        ground: { w: 1.02, h: 0.52, y: 57 },
+        fig: { x: 0.080, y: 0.830, scale: 0.38 }
+      },
+      'ground_cliff+exit_path': {
+        exit: { x: 42, y: 1, scale: 0.84, rot: 0 },
+        ground: { w: 1.02, h: 0.52, y: 57 },
+        fig: { x: 0.080, y: 0.830, scale: 0.38 }
+      },
+      'ground_cliff+exit_stream': {
+        exit: { x: 210, y: 84, scale: 0.84, rot: 0 },
+        ground: { w: 1.02, h: 0.52, y: 34 },
+        fig: { x: 0.080, y: 0.830, scale: 0.38 }
+      },
+
+      // 4. 幽暗水岸 (ground_water)
+      'ground_water+exit_arch': {
+        exit: { x: 42, y: 1, scale: 0.84, rot: 0 },
+        ground: { w: 1.02, h: 0.52, y: 57 },
+        fig: { x: 0.010, y: 0.955, scale: 0.38 }
+      },
+      'ground_water+exit_bridge': {
+        exit: { x: 42, y: 1, scale: 0.84, rot: 0 },
+        ground: { w: 1.02, h: 0.52, y: 57 },
+        fig: { x: 0.010, y: 0.955, scale: 0.38 }
+      },
+      'ground_water+exit_path': {
+        exit: { x: 42, y: 1, scale: 0.84, rot: 0 },
+        ground: { w: 1.02, h: 0.52, y: 57 },
+        fig: { x: 0.010, y: 0.955, scale: 0.38 }
+      },
+      'ground_water+exit_stream': {
+        exit: { x: 193, y: 39, scale: 0.84, rot: 0 },
+        ground: { w: 1.02, h: 0.52, y: 57 },
+        fig: { x: 0.010, y: 0.955, scale: 0.38 }
+      }
     };
 
     const imageCache = {};
@@ -402,7 +494,30 @@
 
     const chkGuide = document.getElementById('chkGuide');
     const outputCoords = document.getElementById('outputCoords');
+    const btnResetPair = document.getElementById('btnResetPair');
     const btnCopyCoords = document.getElementById('btnCopyCoords');
+
+    // 自動套用設定檔
+    function applyPreset(silent = false) {
+      const pairKey = `${selGround.value}+${selExit.value}`;
+      const preset = CALIBRATION_PRESETS[pairKey];
+      if (preset) {
+        rngExitX.value = preset.exit.x;
+        rngExitY.value = preset.exit.y;
+        rngExitScale.value = preset.exit.scale;
+        rngExitRot.value = preset.exit.rot;
+
+        rngGroundW.value = preset.ground.w;
+        rngGroundH.value = preset.ground.h;
+        rngGroundY.value = preset.ground.y;
+
+        rngFigX.value = preset.fig.x;
+        rngFigY.value = preset.fig.y;
+        rngFigScale.value = preset.fig.scale;
+      }
+      updateLabels();
+      liveRender();
+    }
 
     function updateLabels() {
       valExitX.textContent = `${rngExitX.value}px`;
@@ -443,7 +558,7 @@
       const figY = parseFloat(rngFigY.value);
       const figScale = parseFloat(rngFigScale.value);
 
-      // 直接載入原圖，絕無任何破壞性演算法
+      // 原圖直出
       const [imgSky, imgExit, imgGround, imgFigure] = await Promise.all([
         loadImage(`/assets/skies/${sky}.png`),
         loadImage(`/assets/exits/${exit}.png`),
@@ -463,7 +578,7 @@
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip(); // 鎖定在卡面內框
+      ctx.clip();
 
       // 1. 天空
       if (imgSky) {
@@ -478,7 +593,7 @@
         ctx.restore();
       }
 
-      // 2. 出口（退後）
+      // 2. 出口
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -493,7 +608,7 @@
         ctx.restore();
       }
 
-      // 3. 地貌前景（錨定底框，+3px 壓死底邊避免任何隙縫，再加上手動 Y 位移）
+      // 3. 地貌前景 (底框咬合 + 手動微調)
       if (imgGround) {
         ctx.save();
         const groundDrawW = innerW * gW;
@@ -503,7 +618,7 @@
         ctx.restore();
       }
 
-      // 4. 古典環境天光浸染 (Multiply)
+      // 4. 古典環境天光 (Multiply)
       if (SKY_TINTS && SKY_TINTS[sky]) {
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
@@ -535,7 +650,7 @@
       ctx.strokeRect(margin - 8, margin - 8, innerW + 16, innerH + 16);
       ctx.restore();
 
-      // 7. 輔助線與準星 (勾選時顯示)
+      // 7. 輔助線與十字準星
       if (chkGuide.checked) {
         ctx.save();
         ctx.lineWidth = 1;
@@ -565,11 +680,17 @@
       }
     }
 
-    [selSky, selGround, selExit, selFigure].forEach(el => {
+    // 地貌或出口變動時，自動套用校準值
+    [selGround, selExit].forEach(el => {
+      el.addEventListener('change', () => applyPreset(false));
+    });
+
+    [selSky, selFigure].forEach(el => {
       el.addEventListener('change', liveRender);
     });
 
     chkGuide.addEventListener('change', liveRender);
+    btnResetPair.addEventListener('click', () => applyPreset(false));
 
     [rngExitX, rngExitY, rngExitScale, rngExitRot, rngGroundW, rngGroundH, rngGroundY, rngFigX, rngFigY, rngFigScale].forEach(slider => {
       slider.addEventListener('input', () => {
@@ -586,8 +707,7 @@
       });
     });
 
-    updateLabels();
-    liveRender();
+    applyPreset(true);
   </script>
 </body>
 </html>
