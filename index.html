@@ -334,11 +334,19 @@
       ctx.rect(margin, margin, innerW, innerH);
       ctx.clip();
 
-// 1. 天空滿版鋪底
+// 1. 天空滿版鋪底（若是夜空，自動水平鏡像，將月亮星星移至左側）
       if (imgSky) {
-        ctx.drawImage(imgSky, margin, margin, innerW, innerH);
+        ctx.save();
+        if (sky === 'sky_night') {
+          // 水平鏡像：向右平移畫布寬度並水平反轉 scale(-1, 1)
+          ctx.translate(margin + innerW, margin);
+          ctx.scale(-1, 1);
+          ctx.drawImage(imgSky, 0, 0, innerW, innerH);
+        } else {
+          ctx.drawImage(imgSky, margin, margin, innerW, innerH);
+        }
+        ctx.restore();
       }
-
       // 2. 出口（改為先畫！退到地貌後方，起點生硬白邊由地貌遮蔽）
       if (imgExit) {
         ctx.save();
