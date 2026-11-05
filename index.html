@@ -332,7 +332,7 @@
           resolve(img);
         };
         img.onerror = () => {
-          const fallback = path.startsWith('/') ? path.slice(1) : '/' + path;
+          const fallback = path.startsWith('/') ? path.substring(1) : '/' + path;
           const retryImg = new Image();
           retryImg.crossOrigin = 'anonymous';
           retryImg.onload = () => {
@@ -349,14 +349,14 @@
       });
     }
 
-    // 核心濾除器：自動去除白框底與假棋盤格
-    function filterTransparency(sourceImg) {
+    // 智能濾網：直接在前端記憶體剔除「白底方塊」與「假透明黑白棋盤格」
+    function magicPurge(sourceImg) {
       if (!sourceImg) return null;
-      const memCanvas = document.createElement('canvas');
       const w = sourceImg.naturalWidth || sourceImg.width;
       const h = sourceImg.naturalHeight || sourceImg.height;
       if (!w || !h) return sourceImg;
 
+      const memCanvas = document.createElement('canvas');
       memCanvas.width = w;
       memCanvas.height = h;
       const memCtx = memCanvas.getContext('2d');
@@ -364,20 +364,27 @@
 
       try {
         const imgData = memCtx.getImageData(0, 0, w, h);
-        const data = imgData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-          // 判定純白 (r,g,b > 230) 或 灰白棋盤格 (低飽和且偏極亮)
-          if (r > 225 && g > 225 && b > 225 && Math.abs(r - g) < 15 && Math.abs(g - b) < 15) {
-            data[i + 3] = 0;
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const r = d[i];
+          const g = d[i + 1];
+          const b = d[i + 2];
+
+          // 1. 純白/乳白底消除 (r,g,b 都極高且無彩色飽和)
+          const isWhiteBg = (r > 232 && g > 232 && b > 232 && Math.abs(r - g) < 14 && Math.abs(g - b) < 14);
+
+          // 2. 黑白棋盤格消除 (黑格極黑，白格極淺灰，且無色彩)
+          const isDarkSquare = (r < 35 && g < 35 && b < 35);
+          const isLightSquare = (r > 218 && g > 218 && b > 218 && Math.abs(r - g) < 10 && Math.abs(g - b) < 10);
+
+          if (isWhiteBg || isDarkSquare || isLightSquare) {
+            d[i + 3] = 0; // Alpha 強制歸零
           }
         }
         memCtx.putImageData(imgData, 0, 0);
         return memCanvas;
       } catch (e) {
-        return sourceImg;
+        return sourceImg; // 若遇到跨域安全性保護則回退原圖
       }
     }
 
@@ -470,12 +477,13 @@
         loadImage(`/assets/figures/${figure}.png`)
       ]);
 
+      // 天空不濾色；出口、地貌與人物自動執行像素穿透濾網
       const imgSky = rawSky;
-      const imgExit = filterTransparency(rawExit);
-      const imgGround = filterTransparency(rawGround);
-      const imgFigure = filterTransparency(rawFigure);
+      const imgExit = magicPurge(rawExit);
+      const imgGround = magicPurge(rawGround);
+      const imgFigure = magicPurge(rawFigure);
 
-      // 強制歸零 Transform 矩陣
+      // 強制歸零 Transform 矩陣並清空畫布
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -486,9 +494,9 @@
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip(); // 限制所有圖層在框線內
+      ctx.clip(); // 限制所有繪製在畫框內部
 
-      // 1. 天空滿版鋪底（含防禦底色）
+      // 1. 天空滿版鋪底（若素材延遲，鋪上古典漸層防禦底色）
       const skyGrad = ctx.createLinearGradient(margin, margin, margin, margin + innerH);
       skyGrad.addColorStop(0, '#fde68a');
       skyGrad.addColorStop(1, '#f59e0b');
@@ -507,7 +515,7 @@
         ctx.restore();
       }
 
-      // 2. 出口（先畫！退到地貌後方，起點與邊緣交由地貌遮蔽）
+      // 2. 生路出口（先畫：退到地貌後方，起點與邊緣交由地貌遮蔽）
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -522,7 +530,7 @@
         ctx.restore();
       }
 
-      // 3. 地貌前景（後畫！覆蓋在出口之上）
+      // 3. 地貌前景（後畫：覆蓋在出口之上）
       if (imgGround) {
         ctx.save();
         const groundDrawW = innerW * gW;
@@ -541,7 +549,7 @@
         ctx.restore();
       }
 
-      // 5. 旅人姿態（置於最前）
+      // 5. 旅人立像（置於最前）
       if (imgFigure) {
         ctx.save();
         const figH_px = innerH * 0.38;
@@ -553,9 +561,9 @@
         ctx.restore();
       }
 
-      ctx.restore(); // 釋放 clip
+      ctx.restore(); // 釋放 clip 剪裁
 
-      // 6. 1909 偉特古典雙黑線邊框
+      // 6. 1909 偉特雙黑線框
       ctx.save();
       ctx.strokeStyle = '#2b261f';
       ctx.lineWidth = 4;
