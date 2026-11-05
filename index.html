@@ -202,7 +202,7 @@
     </div>
 
     <div class="controls-panel">
-      <!-- 素材下拉選單（完全對齊真實檔名） -->
+      <!-- 素材下拉選單 -->
       <div class="selector-grid">
         <div class="control-group">
           <label>天空 (Sky)</label>
@@ -300,7 +300,6 @@
     const canvas = document.getElementById('tarotCanvas');
     const ctx = canvas.getContext('2d');
 
-    // 古典環境光染色設定 (Multiply 均勻浸染)
     const SKY_TINTS = {
       'sky_gold': 'rgba(212, 175, 55, 0.08)',
       'sky_sunset': 'rgba(224, 110, 60, 0.12)',
@@ -308,7 +307,6 @@
       'sky_night': 'rgba(30, 45, 80, 0.16)'
     };
 
-    // 已驗證的最佳座標資料庫
     const CALIBRATION_PRESETS = {
       'ground_hill+exit_bridge':    { x: 0,   y: 56,  scale: 1.00, rot: 0 },
       'ground_water+exit_stream':   { x: 200, y: 56,  scale: 1.00, rot: 0 },
@@ -324,7 +322,6 @@
 
     const imageCache = {};
 
-    // 支援絕對與相對路徑雙向容錯
     function loadImage(path) {
       if (imageCache[path]) return Promise.resolve(imageCache[path]);
       return new Promise((resolve) => {
@@ -335,7 +332,7 @@
           resolve(img);
         };
         img.onerror = () => {
-          const fallback = path.startsWith('/') ? path.substring(1) : '/' + path;
+          const fallback = path.startsWith('/') ? path.slice(1) : '/' + path;
           const retryImg = new Image();
           retryImg.crossOrigin = 'anonymous';
           retryImg.onload = () => {
@@ -350,6 +347,38 @@
         };
         img.src = path;
       });
+    }
+
+    // 核心濾除器：自動去除白框底與假棋盤格
+    function filterTransparency(sourceImg) {
+      if (!sourceImg) return null;
+      const memCanvas = document.createElement('canvas');
+      const w = sourceImg.naturalWidth || sourceImg.width;
+      const h = sourceImg.naturalHeight || sourceImg.height;
+      if (!w || !h) return sourceImg;
+
+      memCanvas.width = w;
+      memCanvas.height = h;
+      const memCtx = memCanvas.getContext('2d');
+      memCtx.drawImage(sourceImg, 0, 0);
+
+      try {
+        const imgData = memCtx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          // 判定純白 (r,g,b > 230) 或 灰白棋盤格 (低飽和且偏極亮)
+          if (r > 225 && g > 225 && b > 225 && Math.abs(r - g) < 15 && Math.abs(g - b) < 15) {
+            data[i + 3] = 0;
+          }
+        }
+        memCtx.putImageData(imgData, 0, 0);
+        return memCanvas;
+      } catch (e) {
+        return sourceImg;
+      }
     }
 
     const selSky = document.getElementById('selSky');
@@ -434,18 +463,21 @@
       const figX = parseFloat(rngFigX.value);
       const figY = parseFloat(rngFigY.value);
 
-      const [imgSky, imgExit, imgGround, imgFigure] = await Promise.all([
+      const [rawSky, rawExit, rawGround, rawFigure] = await Promise.all([
         loadImage(`/assets/skies/${sky}.png`),
         loadImage(`/assets/exits/${exit}.png`),
         loadImage(`/assets/grounds/${ground}.png`),
         loadImage(`/assets/figures/${figure}.png`)
       ]);
 
-      // 強制重置 Transform 矩陣並清空畫布
+      const imgSky = rawSky;
+      const imgExit = filterTransparency(rawExit);
+      const imgGround = filterTransparency(rawGround);
+      const imgFigure = filterTransparency(rawFigure);
+
+      // 強制歸零 Transform 矩陣
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#e8e0cc';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const margin = 28;
       const innerW = canvas.width - margin * 2;
@@ -454,9 +486,15 @@
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip();
+      ctx.clip(); // 限制所有圖層在框線內
 
-      // 1. 天空滿版鋪底（夜空自動鏡像反轉至左側）
+      // 1. 天空滿版鋪底（含防禦底色）
+      const skyGrad = ctx.createLinearGradient(margin, margin, margin, margin + innerH);
+      skyGrad.addColorStop(0, '#fde68a');
+      skyGrad.addColorStop(1, '#f59e0b');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(margin, margin, innerW, innerH);
+
       if (imgSky) {
         ctx.save();
         if (sky === 'sky_night') {
@@ -469,7 +507,7 @@
         ctx.restore();
       }
 
-      // 2. 生路出口（先畫：退到地貌後方，起點與邊緣交由地貌遮蔽）
+      // 2. 出口（先畫！退到地貌後方，起點與邊緣交由地貌遮蔽）
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -484,7 +522,7 @@
         ctx.restore();
       }
 
-      // 3. 地貌前景（後畫：覆蓋在出口之上）
+      // 3. 地貌前景（後畫！覆蓋在出口之上）
       if (imgGround) {
         ctx.save();
         const groundDrawW = innerW * gW;
@@ -503,11 +541,11 @@
         ctx.restore();
       }
 
-      // 5. 旅人立像（置於最前）
+      // 5. 旅人姿態（置於最前）
       if (imgFigure) {
         ctx.save();
         const figH_px = innerH * 0.38;
-        const figAspect = (imgFigure.naturalWidth / imgFigure.naturalHeight) || 0.6;
+        const figAspect = (imgFigure.width / imgFigure.height) || 0.6;
         const figW_px = figH_px * figAspect;
         const figPosX = margin + innerW * figX;
         const figPosY = margin + innerH * figY - figH_px;
@@ -515,9 +553,9 @@
         ctx.restore();
       }
 
-      ctx.restore(); // 釋放 clip 剪裁
+      ctx.restore(); // 釋放 clip
 
-      // 6. 1909 偉特雙黑線框
+      // 6. 1909 偉特古典雙黑線邊框
       ctx.save();
       ctx.strokeStyle = '#2b261f';
       ctx.lineWidth = 4;
