@@ -3,234 +3,385 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>偉特地景・生版畫視覺校調儀</title>
+  <title>偉特地景・生版畫導引所</title>
   <style>
     :root {
-      --bg-wood: #181614;
-      --panel-bg: #221e1a;
-      --border-parchment: #c2b490;
+      --bg-dark: #141210;
+      --card-bg: #1c1916;
+      --panel-border: #3d352c;
       --accent-gold: #d4af37;
-      --accent-cyan: #4ecdc4;
+      --accent-parchment: #e8e0cc;
+      --accent-crimson: #8a2be2;
+      --btn-gold: #c29d38;
       --text-main: #f5f0e6;
-      --text-muted: #a89f91;
+      --text-muted: #a39786;
+      --gold-gradient: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      user-select: none;
     }
 
     body {
-      background-color: var(--bg-wood);
+      background-color: var(--bg-dark);
       color: var(--text-main);
       font-family: "PingFang TC", "Noto Sans TC", "Songti TC", serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 16px;
+      padding: 30px 16px 60px;
     }
 
     header {
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
+      max-width: 600px;
     }
 
     header h1 {
-      font-size: 1.4rem;
-      letter-spacing: 0.15em;
+      font-size: 1.6rem;
+      letter-spacing: 0.2em;
       color: var(--accent-gold);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      font-weight: 600;
     }
 
     header p {
-      font-size: 0.8rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
+      line-height: 1.5;
     }
 
-    .workbench {
+    .main-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px;
+      gap: 28px;
       width: 100%;
-      max-width: 1120px;
+      max-width: 900px;
     }
 
-    .stage-container {
+    /* 畫布外框 */
+    .card-stage {
       position: relative;
-      background: #0d0c0b;
-      padding: 10px;
-      border: 1px solid #3d352c;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
-      border-radius: 4px;
+      background: #080706;
+      padding: 12px;
+      border: 1px solid var(--panel-border);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95), 0 0 0 1px #221d17;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
     }
 
     canvas {
       display: block;
-      background-color: #e8e0cc;
+      background-color: var(--accent-parchment);
       max-width: 100%;
       height: auto;
+      border-radius: 2px;
     }
 
-    .controls-panel {
+    /* 輸入表單區塊 */
+    .form-panel {
       width: 100%;
-      background: var(--panel-bg);
-      border: 1px solid #3d352c;
-      border-radius: 4px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 24px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
 
-    .selector-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 12px;
-    }
-
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .control-group label {
-      font-size: 0.78rem;
+    .form-title {
+      font-size: 1.05rem;
       color: var(--accent-gold);
+      margin-bottom: 16px;
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      border-bottom: 1px solid #2b251f;
+      padding-bottom: 8px;
     }
 
-    .control-group label span.val {
-      color: var(--accent-cyan);
-      font-family: monospace;
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
-    select, input[type="range"], button {
-      background: #141210;
-      border: 1px solid #4a3f35;
+    .input-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-field label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    select, input[type="text"] {
+      background: #100f0d;
+      border: 1px solid #42382c;
       color: var(--text-main);
-      padding: 7px 10px;
-      border-radius: 3px;
-      font-size: 0.82rem;
+      padding: 9px 12px;
+      border-radius: 4px;
+      font-size: 0.88rem;
       outline: none;
+      transition: border 0.2s;
     }
 
-    select:focus, button:focus {
+    select:focus, input[type="text"]:focus {
       border-color: var(--accent-gold);
     }
 
-    .section-title {
-      font-size: 0.8rem;
-      font-weight: bold;
-      color: var(--accent-gold);
-      border-bottom: 1px solid #3d352c;
-      padding-bottom: 4px;
-      margin-top: 4px;
-    }
-
-    .slider-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    .action-row {
+      display: flex;
       gap: 12px;
-      background: #191613;
-      padding: 10px 12px;
-      border-radius: 4px;
-      border: 1px solid #2d2620;
-    }
-
-    input[type="range"] {
-      padding: 0;
-      height: 6px;
-      cursor: pointer;
-      accent-color: var(--accent-gold);
-    }
-
-    .toggles-and-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      justify-content: center;
       flex-wrap: wrap;
-      gap: 10px;
-      padding-top: 4px;
-    }
-
-    .checkbox-label {
-      font-size: 0.82rem;
-      color: var(--accent-cyan);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 8px;
     }
 
     button {
       cursor: pointer;
       font-weight: 500;
-      padding: 6px 14px;
-      background: #2f2720;
-      border-color: #554536;
+      padding: 10px 24px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      letter-spacing: 0.05em;
     }
 
-    button:hover {
-      background: #42362b;
+    .btn-secondary {
+      background: #2b2520;
+      border-color: #4a3e33;
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: #3d342c;
+      border-color: var(--accent-gold);
+    }
+
+    .btn-primary {
+      background: var(--gold-gradient);
+      color: #12100d;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* 報告區塊與付費牆 */
+    .report-card {
+      width: 100%;
+      background: #181512;
+      border: 1px solid #383025;
+      border-radius: 6px;
+      padding: 24px;
+      display: none;
+      position: relative;
+    }
+
+    .report-card.show {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .report-header {
+      border-bottom: 1px solid #2e261d;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .report-header h2 {
+      font-size: 1.15rem;
+      color: var(--accent-gold);
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .report-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .preview-text {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: #ded6c8;
+      margin-bottom: 16px;
+    }
+
+    /* 付費遮罩 Lock Overlay */
+    .paywall-container {
+      position: relative;
+      background: rgba(14, 12, 10, 0.7);
+      border: 1px dashed #594935;
+      border-radius: 6px;
+      padding: 32px 20px;
+      text-align: center;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .paywall-container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      backdrop-filter: blur(4px);
+      z-index: 1;
+    }
+
+    .paywall-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .paywall-price {
+      font-size: 1.4rem;
+      font-weight: bold;
       color: var(--accent-gold);
     }
 
-    button.primary {
-      background: #7a2b22;
-      border-color: #a83c30;
-      color: #fff;
+    .paywall-desc {
+      font-size: 0.82rem;
+      color: #beb2a2;
+      line-height: 1.5;
     }
 
-    .coords-output {
-      font-family: monospace;
-      font-size: 0.78rem;
-      background: #0f0d0b;
-      padding: 8px 12px;
+    .btn-pay {
+      background: #7a281d;
+      color: #fff;
+      border: 1px solid #a8382a;
+      padding: 11px 32px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+
+    .btn-pay:hover {
+      background: #963224;
+      box-shadow: 0 0 14px rgba(168, 56, 42, 0.5);
+    }
+
+    /* 解鎖後的完整報告 */
+    .full-report {
+      display: none;
+      font-size: 0.94rem;
+      line-height: 1.85;
+      color: #e5ded3;
+      padding: 16px 0;
+      letter-spacing: 0.03em;
+      text-align: justify;
+    }
+
+    .full-report p {
+      margin-bottom: 14px;
+    }
+
+    .full-report .highlight {
+      color: var(--accent-gold);
+      font-weight: bold;
+    }
+
+    .unlocked-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      background: #253321;
+      border: 1px solid #436939;
+      color: #8ed681;
       border-radius: 3px;
-      color: #9fe6a0;
-      border: 1px solid #28221b;
-      word-break: break-all;
+      font-size: 0.75rem;
+      margin-bottom: 12px;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>偉特地景・生版畫視覺校調儀</h1>
-    <p>16 組全地貌 × 出口 × 人物 完美咬合工程總成</p>
+    <h1>偉特地景・生版畫導引所</h1>
+    <p>以 1909 古版木刻地景錨定內在座標，結合人類圖運作機制，推演當前生路指引。</p>
   </header>
 
-  <div class="workbench">
-    <div class="stage-container">
+  <div class="main-container">
+    <!-- 視覺卡面 Stage -->
+    <div class="card-stage">
       <canvas id="tarotCanvas" width="1200" height="800"></canvas>
     </div>
 
-    <div class="controls-panel">
-      <!-- 1. 素材選擇器 -->
-      <div class="selector-grid">
-        <div class="control-group">
-          <label>天空 (Sky)</label>
-          <select id="selSky">
-            <option value="sky_gold">金黃天光 (sky_gold)</option>
-            <option value="sky_night">幽暗夜空 (sky_night / 鏡像)</option>
-            <option value="sky_sunset">落日餘暉 (sky_sunset)</option>
-            <option value="sky_storm">風暴雷雲 (sky_storm)</option>
+    <!-- 人類圖與意象配置區塊 -->
+    <div class="form-panel">
+      <div class="form-title">
+        <span>✦</span> 人類圖參數設定與地景探索
+      </div>
+
+      <div class="form-grid">
+        <!-- 核心類型 -->
+        <div class="input-field">
+          <label>人類圖類型 (Type)</label>
+          <select id="hdType">
+            <option value="generator">生產者 (Generator)</option>
+            <option value="manifesting_generator">顯示型生產者 (MG)</option>
+            <option value="projector">投射者 (Projector)</option>
+            <option value="manifestor">顯示者 (Manifestor)</option>
+            <option value="reflector">反映者 (Reflector)</option>
           </select>
         </div>
 
-        <div class="control-group">
-          <label>地貌 (Ground)</label>
+        <!-- 內在權威 -->
+        <div class="input-field">
+          <label>內在權威 (Authority)</label>
+          <select id="hdAuthority">
+            <option value="sacral">薦骨權威 (Sacral)</option>
+            <option value="solar">情緒中心 (Solar Plexus)</option>
+            <option value="splenic">直覺權威 (Splenic)</option>
+            <option value="ego">意志力權威 (Ego)</option>
+            <option value="self">自我投射 (Self-Projected)</option>
+            <option value="none">無內在權威 / 月相 (None/Moon)</option>
+          </select>
+        </div>
+
+        <!-- 人生角色 -->
+        <div class="input-field">
+          <label>人生角色 (Profile)</label>
+          <select id="hdProfile">
+            <option value="1/3">1/3 研究者 / 殉道者</option>
+            <option value="1/4">1/4 研究者 / 機會主義者</option>
+            <option value="2/4">2/4 隱士 / 機會主義者</option>
+            <option value="2/5">2/5 隱士 / 異端者</option>
+            <option value="3/5">3/5 殉道者 / 異端者</option>
+            <option value="3/6">3/6 殉道者 / 榜樣</option>
+            <option value="4/6">4/6 機會主義者 / 榜樣</option>
+            <option value="5/1">5/1 異端者 / 實踐研究者</option>
+            <option value="5/2">5/2 異端者 / 隱士</option>
+            <option value="6/2">6/2 榜樣 / 隱士</option>
+            <option value="6/3">6/3 榜樣 / 殉道者</option>
+          </select>
+        </div>
+
+        <!-- 地景組合自選 (或隨機) -->
+        <div class="input-field">
+          <label>當前地貌 (Ground)</label>
           <select id="selGround">
             <option value="ground_terrace">石階高台 (ground_terrace)</option>
             <option value="ground_hill">起伏山丘 (ground_hill)</option>
@@ -239,7 +390,7 @@
           </select>
         </div>
 
-        <div class="control-group">
+        <div class="input-field">
           <label>生路出口 (Exit)</label>
           <select id="selExit">
             <option value="exit_arch">雙塔石門 (exit_arch)</option>
@@ -249,7 +400,17 @@
           </select>
         </div>
 
-        <div class="control-group">
+        <div class="input-field">
+          <label>天光氣候 (Sky)</label>
+          <select id="selSky">
+            <option value="sky_gold">金黃天光 (sky_gold)</option>
+            <option value="sky_sunset">落日餘暉 (sky_sunset)</option>
+            <option value="sky_night">幽暗夜空 (sky_night)</option>
+            <option value="sky_storm">風暴雷雲 (sky_storm)</option>
+          </select>
+        </div>
+
+        <div class="input-field">
           <label>旅人姿態 (Figure)</label>
           <select id="selFigure">
             <option value="figure_guard">手持長杖 (figure_guard)</option>
@@ -260,75 +421,44 @@
         </div>
       </div>
 
-      <!-- 2. 生路出口 軸向定位 -->
-      <div class="section-title">生路出口 (Exit) 軸向定位</div>
-      <div class="slider-row">
-        <div class="control-group">
-          <label>出口 X 軸位移 <span class="val" id="valExitX">0px</span></label>
-          <input type="range" id="rngExitX" min="-400" max="400" step="1" value="0">
-        </div>
-        <div class="control-group">
-          <label>出口 Y 軸位移 <span class="val" id="valExitY">0px</span></label>
-          <input type="range" id="rngExitY" min="-300" max="300" step="1" value="0">
-        </div>
-        <div class="control-group">
-          <label>等比縮放 <span class="val" id="valExitScale">1.00x</span></label>
-          <input type="range" id="rngExitScale" min="0.5" max="1.6" step="0.01" value="1.00">
-        </div>
-        <div class="control-group">
-          <label>角度旋轉 <span class="val" id="valExitRot">0°</span></label>
-          <input type="range" id="rngExitRot" min="-20" max="20" step="0.5" value="0">
+      <div class="action-row">
+        <button id="btnRandomize" class="btn-secondary">✦ 隨機感應地景</button>
+        <button id="btnGenerateReport" class="btn-primary">生成生路分析報告 ➔</button>
+      </div>
+    </div>
+
+    <!-- 報告與付費牆區塊 -->
+    <div class="report-card" id="reportCard">
+      <div class="report-header">
+        <h2 id="reportHeadline">地景定盤 × 人類圖能量解讀</h2>
+        <div class="report-meta" id="reportMetaInfo">生產者 1/3 ｜ 薦骨權威 ｜ 石階高台 × 雙塔石門</div>
+      </div>
+
+      <div class="preview-text" id="previewText">
+        <!-- 前導預覽文字 -->
+      </div>
+
+      <!-- 付費鎖 (Paywall) -->
+      <div class="paywall-container" id="paywallBox">
+        <div class="paywall-content">
+          <div class="paywall-price">NT$ 199</div>
+          <div class="paywall-desc">
+            解鎖 300 字深度生路導引完整報告：包含地景隱喻拆解、人類圖阻力辨識，以及未來 30 天實踐指引。
+          </div>
+          <button class="btn-pay" id="btnUnlock">立即解鎖完整 300 字報告</button>
         </div>
       </div>
 
-      <!-- 3. 地貌 軸向定位 -->
-      <div class="section-title">地貌 (Ground) 軸向定位</div>
-      <div class="slider-row">
-        <div class="control-group">
-          <label>地貌 寬度比例 <span class="val" id="valGroundW">1.00</span></label>
-          <input type="range" id="rngGroundW" min="0.7" max="1.4" step="0.01" value="1.00">
+      <!-- 解鎖後的完整 300 字內容 -->
+      <div class="full-report" id="fullReportContent">
+        <div class="unlocked-badge">✓ 已完成授權解鎖</div>
+        <div id="fullReportText">
+          <!-- 300 字動態生成文字 -->
         </div>
-        <div class="control-group">
-          <label>地貌 高度延展 <span class="val" id="valGroundH">0.52</span></label>
-          <input type="range" id="rngGroundH" min="0.3" max="0.8" step="0.01" value="0.52">
+        <div class="action-row" style="margin-top: 20px; justify-content: flex-start;">
+          <button id="btnDownloadCard" class="btn-secondary">儲存明信片圖像</button>
+          <button id="btnCopyReport" class="btn-secondary">複製文字報告</button>
         </div>
-        <div class="control-group">
-          <label>地貌 底部微調 (正值往下壓) <span class="val" id="valGroundY">0px</span></label>
-          <input type="range" id="rngGroundY" min="-30" max="80" step="1" value="0">
-        </div>
-      </div>
-
-      <!-- 4. 旅人 軸向定位 -->
-      <div class="section-title">旅人 (Figure) 軸向定位</div>
-      <div class="slider-row">
-        <div class="control-group">
-          <label>旅人 X 軸位置 <span class="val" id="valFigX">0.080</span></label>
-          <input type="range" id="rngFigX" min="0.005" max="0.5" step="0.005" value="0.080">
-        </div>
-        <div class="control-group">
-          <label>旅人 Y 軸錨點 <span class="val" id="valFigY">0.900</span></label>
-          <input type="range" id="rngFigY" min="0.6" max="1.0" step="0.005" value="0.900">
-        </div>
-        <div class="control-group">
-          <label>旅人 尺寸比例 <span class="val" id="valFigScale">0.38</span></label>
-          <input type="range" id="rngFigScale" min="0.25" max="0.55" step="0.01" value="0.38">
-        </div>
-      </div>
-
-      <div class="toggles-and-actions">
-        <label class="checkbox-label">
-          <input type="checkbox" id="chkGuide">
-          顯示輔助參考線與準星
-        </label>
-
-        <div class="btn-row">
-          <button id="btnResetPair" class="primary">重新套用本組合黃金值</button>
-          <button id="btnCopyCoords">複製當前數值</button>
-        </div>
-      </div>
-
-      <div class="coords-output" id="outputCoords">
-        Ground: [W:1.00, H:0.52, Y:0] | Exit: [X:0, Y:0, Scale:1.00, Rot:0°] | Fig: [X:0.080, Y:0.900, S:0.38]
       </div>
     </div>
   </div>
@@ -390,7 +520,7 @@
         fig: { x: 0.080, y: 0.830, scale: 0.38 }
       },
 
-// 3. 荒蕪峭壁 (ground_cliff) - 旅人姿態已統一鎖定至 X:0.110, Y:0.685
+      // 3. 荒蕪峭壁 (ground_cliff) - 旅人固定於 X:0.110, Y:0.685
       'ground_cliff+exit_arch': {
         exit: { x: 42, y: 1, scale: 0.84, rot: 0 },
         ground: { w: 1.02, h: 0.52, y: 57 },
@@ -466,99 +596,38 @@
     const selExit = document.getElementById('selExit');
     const selFigure = document.getElementById('selFigure');
 
-    const rngExitX = document.getElementById('rngExitX');
-    const rngExitY = document.getElementById('rngExitY');
-    const rngExitScale = document.getElementById('rngExitScale');
-    const rngExitRot = document.getElementById('rngExitRot');
+    const hdType = document.getElementById('hdType');
+    const hdAuthority = document.getElementById('hdAuthority');
+    const hdProfile = document.getElementById('hdProfile');
 
-    const rngGroundW = document.getElementById('rngGroundW');
-    const rngGroundH = document.getElementById('rngGroundH');
-    const rngGroundY = document.getElementById('rngGroundY');
+    const reportCard = document.getElementById('reportCard');
+    const reportHeadline = document.getElementById('reportHeadline');
+    const reportMetaInfo = document.getElementById('reportMetaInfo');
+    const previewText = document.getElementById('previewText');
+    const paywallBox = document.getElementById('paywallBox');
+    const fullReportContent = document.getElementById('fullReportContent');
+    const fullReportText = document.getElementById('fullReportText');
 
-    const rngFigX = document.getElementById('rngFigX');
-    const rngFigY = document.getElementById('rngFigY');
-    const rngFigScale = document.getElementById('rngFigScale');
+    const btnGenerateReport = document.getElementById('btnGenerateReport');
+    const btnUnlock = document.getElementById('btnUnlock');
+    const btnRandomize = document.getElementById('btnRandomize');
+    const btnDownloadCard = document.getElementById('btnDownloadCard');
+    const btnCopyReport = document.getElementById('btnCopyReport');
 
-    const valExitX = document.getElementById('valExitX');
-    const valExitY = document.getElementById('valExitY');
-    const valExitScale = document.getElementById('valExitScale');
-    const valExitRot = document.getElementById('valExitRot');
-
-    const valGroundW = document.getElementById('valGroundW');
-    const valGroundH = document.getElementById('valGroundH');
-    const valGroundY = document.getElementById('valGroundY');
-
-    const valFigX = document.getElementById('valFigX');
-    const valFigY = document.getElementById('valFigY');
-    const valFigScale = document.getElementById('valFigScale');
-
-    const chkGuide = document.getElementById('chkGuide');
-    const outputCoords = document.getElementById('outputCoords');
-    const btnResetPair = document.getElementById('btnResetPair');
-    const btnCopyCoords = document.getElementById('btnCopyCoords');
-
-    // 自動套用設定檔
-    function applyPreset(silent = false) {
-      const pairKey = `${selGround.value}+${selExit.value}`;
-      const preset = CALIBRATION_PRESETS[pairKey];
-      if (preset) {
-        rngExitX.value = preset.exit.x;
-        rngExitY.value = preset.exit.y;
-        rngExitScale.value = preset.exit.scale;
-        rngExitRot.value = preset.exit.rot;
-
-        rngGroundW.value = preset.ground.w;
-        rngGroundH.value = preset.ground.h;
-        rngGroundY.value = preset.ground.y;
-
-        rngFigX.value = preset.fig.x;
-        rngFigY.value = preset.fig.y;
-        rngFigScale.value = preset.fig.scale;
-      }
-      updateLabels();
-      liveRender();
-    }
-
-    function updateLabels() {
-      valExitX.textContent = `${rngExitX.value}px`;
-      valExitY.textContent = `${rngExitY.value}px`;
-      valExitScale.textContent = `${parseFloat(rngExitScale.value).toFixed(2)}x`;
-      valExitRot.textContent = `${rngExitRot.value}°`;
-
-      valGroundW.textContent = parseFloat(rngGroundW.value).toFixed(2);
-      valGroundH.textContent = parseFloat(rngGroundH.value).toFixed(2);
-      valGroundY.textContent = `${rngGroundY.value}px`;
-
-      valFigX.textContent = parseFloat(rngFigX.value).toFixed(3);
-      valFigY.textContent = parseFloat(rngFigY.value).toFixed(3);
-      valFigScale.textContent = parseFloat(rngFigScale.value).toFixed(2);
-
-      outputCoords.textContent = 
-        `Ground: [W:${valGroundW.textContent}, H:${valGroundH.textContent}, Y:${rngGroundY.value}] | ` +
-        `Exit: [X:${rngExitX.value}, Y:${rngExitY.value}, Scale:${valExitScale.textContent.replace('x','')}, Rot:${rngExitRot.value}°] | ` +
-        `Fig: [X:${valFigX.textContent}, Y:${valFigY.textContent}, S:${valFigScale.textContent}]`;
-    }
-
-    async function liveRender() {
+    // 核心渲染引擎
+    async function renderScene() {
       const sky = selSky.value;
       const ground = selGround.value;
       const exit = selExit.value;
       const figure = selFigure.value;
 
-      const exitX = parseFloat(rngExitX.value);
-      const exitY = parseFloat(rngExitY.value);
-      const exitScale = parseFloat(rngExitScale.value);
-      const exitRot = parseFloat(rngExitRot.value);
+      const pairKey = `${ground}+${exit}`;
+      const preset = CALIBRATION_PRESETS[pairKey] || {
+        exit: { x: 0, y: 0, scale: 1.0, rot: 0 },
+        ground: { w: 1.0, h: 0.52, y: 50 },
+        fig: { x: 0.08, y: 0.90, scale: 0.38 }
+      };
 
-      const gW = parseFloat(rngGroundW.value);
-      const gH = parseFloat(rngGroundH.value);
-      const gYOffset = parseFloat(rngGroundY.value);
-
-      const figX = parseFloat(rngFigX.value);
-      const figY = parseFloat(rngFigY.value);
-      const figScale = parseFloat(rngFigScale.value);
-
-      // 原圖直出
       const [imgSky, imgExit, imgGround, imgFigure] = await Promise.all([
         loadImage(`/assets/skies/${sky}.png`),
         loadImage(`/assets/exits/${exit}.png`),
@@ -599,26 +668,26 @@
         const anchorX = margin + innerW * 0.80;
         const anchorY = margin + innerH * 0.75;
 
-        ctx.translate(anchorX + exitX, anchorY + exitY);
-        ctx.rotate((exitRot * Math.PI) / 180);
-        ctx.scale(exitScale, exitScale);
+        ctx.translate(anchorX + preset.exit.x, anchorY + preset.exit.y);
+        ctx.rotate((preset.exit.rot * Math.PI) / 180);
+        ctx.scale(preset.exit.scale, preset.exit.scale);
         ctx.translate(-anchorX, -anchorY);
 
         ctx.drawImage(imgExit, margin, margin, innerW, innerH);
         ctx.restore();
       }
 
-      // 3. 地貌前景 (底框咬合 + 手動微調)
+      // 3. 地貌前景（底端鎖定 + 微調 Y）
       if (imgGround) {
         ctx.save();
-        const groundDrawW = innerW * gW;
-        const groundDrawH = innerH * gH;
-        const groundDrawY = (margin + innerH) - groundDrawH + 3 + gYOffset;
+        const groundDrawW = innerW * preset.ground.w;
+        const groundDrawH = innerH * preset.ground.h;
+        const groundDrawY = (margin + innerH) - groundDrawH + 3 + preset.ground.y;
         ctx.drawImage(imgGround, margin, groundDrawY, groundDrawW, groundDrawH);
         ctx.restore();
       }
 
-      // 4. 古典環境天光 (Multiply)
+      // 4. 古典環境光
       if (SKY_TINTS && SKY_TINTS[sky]) {
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
@@ -627,14 +696,14 @@
         ctx.restore();
       }
 
-      // 5. 旅人姿態
+      // 5. 旅人立像
       if (imgFigure) {
         ctx.save();
-        const figH_px = innerH * figScale;
+        const figH_px = innerH * preset.fig.scale;
         const figAspect = (imgFigure.naturalWidth / imgFigure.naturalHeight) || 0.6;
         const figW_px = figH_px * figAspect;
-        const figPosX = margin + innerW * figX;
-        const figPosY = margin + innerH * figY - figH_px;
+        const figPosX = margin + innerW * preset.fig.x;
+        const figPosY = margin + innerH * preset.fig.y - figH_px;
         ctx.drawImage(imgFigure, figPosX, figPosY, figW_px, figH_px);
         ctx.restore();
       }
@@ -649,65 +718,133 @@
       ctx.lineWidth = 1.5;
       ctx.strokeRect(margin - 8, margin - 8, innerW + 16, innerH + 16);
       ctx.restore();
-
-      // 7. 輔助線與十字準星
-      if (chkGuide.checked) {
-        ctx.save();
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-
-        ctx.strokeStyle = 'rgba(78, 205, 196, 0.7)';
-        ctx.beginPath();
-        ctx.moveTo(margin, canvas.height / 2);
-        ctx.lineTo(margin + innerW, canvas.height / 2);
-        ctx.moveTo(canvas.width / 2, margin);
-        ctx.lineTo(canvas.width / 2, margin + innerH);
-        ctx.stroke();
-
-        const curExitAnchorX = margin + innerW * 0.80 + exitX;
-        const curExitAnchorY = margin + innerH * 0.75 + exitY;
-        ctx.strokeStyle = 'rgba(255, 68, 68, 0.9)';
-        ctx.setLineDash([]);
-        ctx.beginPath();
-        ctx.arc(curExitAnchorX, curExitAnchorY, 6, 0, Math.PI * 2);
-        ctx.moveTo(curExitAnchorX - 16, curExitAnchorY);
-        ctx.lineTo(curExitAnchorX + 16, curExitAnchorY);
-        ctx.moveTo(curExitAnchorX, curExitAnchorY - 16);
-        ctx.lineTo(curExitAnchorX, curExitAnchorY + 16);
-        ctx.stroke();
-
-        ctx.restore();
-      }
     }
 
-    // 地貌或出口變動時，自動套用校準值
-    [selGround, selExit].forEach(el => {
-      el.addEventListener('change', () => applyPreset(false));
+    // 隨機抽選地景
+    function randomizeSelection() {
+      const skies = ['sky_gold', 'sky_sunset', 'sky_night', 'sky_storm'];
+      const grounds = ['ground_terrace', 'ground_hill', 'ground_cliff', 'ground_water'];
+      const exits = ['exit_arch', 'exit_bridge', 'exit_path', 'exit_stream'];
+      const figures = ['figure_guard', 'figure_stand', 'figure_sit', 'figure_walk'];
+
+      selSky.value = skies[Math.floor(Math.random() * skies.length)];
+      selGround.value = grounds[Math.floor(Math.random() * grounds.length)];
+      selExit.value = exits[Math.floor(Math.random() * exits.length)];
+      selFigure.value = figures[Math.floor(Math.random() * figures.length)];
+
+      renderScene();
+    }
+
+    // 動態合成 300 字深度分析報告文案
+    function buildDetailedReport() {
+      const typeLabel = hdType.options[hdType.selectedIndex].text;
+      const authLabel = hdAuthority.options[hdAuthority.selectedIndex].text;
+      const profLabel = hdProfile.value;
+      const groundText = selGround.options[selGround.selectedIndex].text;
+      const exitText = selExit.options[selExit.selectedIndex].text;
+      const skyText = selSky.options[selSky.selectedIndex].text;
+
+      // 根據人類圖與地景語義進行精準敘事生成
+      let typeStrategy = "";
+      let energyChallenge = "";
+      if (hdType.value === 'generator' || hdType.value === 'manifesting_generator') {
+        typeStrategy = "你需要放下頭腦的主動追逐，回歸『等待回應』與薦骨本能的真切顫動。不要在未獲邀請或內在尚未燃起火花時強行推動。";
+        energyChallenge = "挫敗感往往源於過早涉入不屬於你的戰場，消耗了寶貴的原動力。";
+      } else if (hdType.value === 'projector') {
+        typeStrategy = "你的天賦在於洞察系統結構，切忌主動推銷或強行主導，唯有在獲得『真正被看見的正式邀請』下，你的引導方能化作實相。";
+        energyChallenge = "苦澀感往往來自於過度輸出智慧卻未被珍惜的無力感。";
+      } else if (hdType.value === 'manifestor') {
+        typeStrategy = "你擁有天生的開拓力，但行動前的『告知』是你消弭阻力、平息周遭不安的最重要保護色。";
+        energyChallenge = "憤怒感往往源於行動受阻或他人不理解的牽制。";
+      } else {
+        typeStrategy = "讓自己沉浸於時間長河中，等待一個月相週期的光影映照，環境的純淨度決定了你的清澈度。";
+        energyChallenge = "失望感多半來自於環境能量過度紛雜混濁。";
+      }
+
+      let groundMetaphor = "";
+      if (selGround.value === 'ground_cliff') groundMetaphor = "立於荒蕪峭壁之巔，象徵你正處於視野開闊卻缺乏實質支撐的轉折期。";
+      else if (selGround.value === 'ground_terrace') groundMetaphor = "石階高台代表過往建構的基石依然穩固，眼前的遲滯並非倒退，而是地基的重新沉降。";
+      else if (selGround.value === 'ground_hill') groundMetaphor = "起伏山丘暗示起落乃常態，每一步攀爬都在為視野蓄力。";
+      else groundMetaphor = "幽暗水岸映照著深層直覺與情緒波瀾，水流匯聚之處即是靈感滋養地。";
+
+      let exitMetaphor = "";
+      if (selExit.value === 'exit_arch') exitMetaphor = "石門橫亙前方，暗示著邊界與嚴謹的承諾，通過它需要經由內在權威的嚴格篩選。";
+      else if (selExit.value === 'exit_bridge') exitMetaphor = "木橋跨越深谷，象徵階段性的過渡，無需戀棧彼岸，只管專注踩穩每一步。";
+      else if (selExit.value === 'exit_path') exitMetaphor = "林間小徑蜿蜒隱密，指引你生路不在宏大藍圖，而在觸手可及的具體微小實踐。";
+      else exitMetaphor = "幽谷溪流順勢而下，提示你順應重力與時機，阻力最小的途徑往往就是正途。";
+
+      // 產生完整 300 字段落
+      const reportFullParagraph = `
+        <p>【地景格局辨識】${groundMetaphor}${exitMetaphor}在${skyText}的籠罩下，外在局勢的張力已到達臨界點，眼前顯現的並非無路可走，而是舊有路徑的承載力已達到極限。</p>
+        <p>【人類圖能量調校】身為「<span class="highlight">${typeLabel}</span>」，並依循「<span class="highlight">${authLabel}</span>」與「<span class="highlight">${profLabel}</span>」人生角色，${typeStrategy}${energyChallenge}此時強行做出邏輯決定只會陷入虛耗。</p>
+        <p>【30日生路破局行動】收斂對未來的過度推演，將意識退回到當下立足點。允許石階沉降、讓溪流自尋出口；當你停止以頭腦蠻力撞擊石門，內在權威自會為你撥開迷霧，真正的生路將於回應之處自然浮現。</p>
+      `;
+
+      return {
+        preview: `地景顯像為【${groundText} × ${exitText}】。當前局勢表面受限，實則暗示能量正在內部重新沉降聚合。對於具備【${typeLabel}】與【${authLabel}】配置的你，真正的關鍵並非盲目突圍，而在於辨識阻力來源...`,
+        full: reportFullParagraph
+      };
+    }
+
+    // 事件綁定
+    [selSky, selGround, selExit, selFigure].forEach(el => {
+      el.addEventListener('change', renderScene);
     });
 
-    [selSky, selFigure].forEach(el => {
-      el.addEventListener('change', liveRender);
+    btnRandomize.addEventListener('click', randomizeSelection);
+
+    btnGenerateReport.addEventListener('click', () => {
+      const report = buildDetailedReport();
+      const typeLabel = hdType.options[hdType.selectedIndex].text.split(' ')[0];
+      const authLabel = hdAuthority.options[hdAuthority.selectedIndex].text.split(' ')[0];
+      const groundText = selGround.options[selGround.selectedIndex].text.split(' ')[0];
+      const exitText = selExit.options[selExit.selectedIndex].text.split(' ')[0];
+
+      reportMetaInfo.textContent = `${typeLabel} ${hdProfile.value} ｜ ${authLabel} ｜ ${groundText} × ${exitText}`;
+      previewText.textContent = report.preview;
+      fullReportText.innerHTML = report.full;
+
+      // 重設為未解鎖狀態
+      paywallBox.style.display = 'block';
+      fullReportContent.style.display = 'none';
+
+      reportCard.classList.add('show');
+      reportCard.scrollIntoView({ behavior: 'smooth' });
     });
 
-    chkGuide.addEventListener('change', liveRender);
-    btnResetPair.addEventListener('click', () => applyPreset(false));
+    // 模擬付費解鎖流程
+    btnUnlock.addEventListener('click', () => {
+      btnUnlock.textContent = '金流驗證處理中...';
+      btnUnlock.disabled = true;
 
-    [rngExitX, rngExitY, rngExitScale, rngExitRot, rngGroundW, rngGroundH, rngGroundY, rngFigX, rngFigY, rngFigScale].forEach(slider => {
-      slider.addEventListener('input', () => {
-        updateLabels();
-        liveRender();
+      setTimeout(() => {
+        paywallBox.style.display = 'none';
+        fullReportContent.style.display = 'block';
+        btnUnlock.textContent = '立即解鎖完整 300 字報告';
+        btnUnlock.disabled = false;
+      }, 700);
+    });
+
+    // 儲存明信片
+    btnDownloadCard.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `tarot_landscape_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // 複製文字報告
+    btnCopyReport.addEventListener('click', () => {
+      const rawText = fullReportText.innerText;
+      navigator.clipboard.writeText(rawText).then(() => {
+        const orig = btnCopyReport.textContent;
+        btnCopyReport.textContent = '已複製報告全文！';
+        setTimeout(() => btnCopyReport.textContent = orig, 1500);
       });
     });
 
-    btnCopyCoords.addEventListener('click', () => {
-      navigator.clipboard.writeText(outputCoords.textContent).then(() => {
-        const orig = btnCopyCoords.textContent;
-        btnCopyCoords.textContent = '已複製！';
-        setTimeout(() => btnCopyCoords.textContent = orig, 1500);
-      });
-    });
-
-    applyPreset(true);
+    // 初始化渲染
+    renderScene();
   </script>
 </body>
 </html>
