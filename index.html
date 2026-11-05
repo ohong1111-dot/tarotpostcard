@@ -1,4 +1,469 @@
-async function liveRender() {
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>偉特地景・生版畫視覺校調儀</title>
+  <style>
+    :root {
+      --bg-wood: #1e1b18;
+      --panel-bg: #2a2521;
+      --border-parchment: #c2b490;
+      --accent-gold: #d4af37;
+      --text-main: #f5f0e6;
+      --text-muted: #b8ad9e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-wood);
+      color: var(--text-main);
+      font-family: "PingFang TC", "Noto Sans TC", "Songti TC", serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      letter-spacing: 0.15em;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .workbench {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      width: 100%;
+      max-width: 1080px;
+    }
+
+    .stage-container {
+      position: relative;
+      background: #151311;
+      padding: 12px;
+      border: 1px solid #4a4035;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 0 1px #000;
+      border-radius: 4px;
+    }
+
+    canvas {
+      display: block;
+      background-color: #e8e0cc;
+      max-width: 100%;
+      height: auto;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .controls-panel {
+      width: 100%;
+      background: var(--panel-bg);
+      border: 1px solid #4a4035;
+      border-radius: 4px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-group label {
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .control-group label span.val {
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    select, input[type="range"], button {
+      background: #181513;
+      border: 1px solid #5a4e40;
+      color: var(--text-main);
+      padding: 8px 10px;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    select:focus, button:focus {
+      border-color: var(--accent-gold);
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      background: #201c18;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #383028;
+    }
+
+    input[type="range"] {
+      padding: 0;
+      height: 6px;
+      cursor: pointer;
+      accent-color: var(--accent-gold);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 500;
+      padding: 8px 18px;
+      background: #3a322b;
+      border-color: #6a5a4a;
+    }
+
+    button:hover {
+      background: #4a4037;
+      color: var(--accent-gold);
+      border-color: var(--accent-gold);
+    }
+
+    button.primary {
+      background: #7a2b22;
+      border-color: #a83c30;
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: #96352a;
+      border-color: #d14b3d;
+    }
+
+    .coords-output {
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: #141210;
+      padding: 10px 14px;
+      border-radius: 3px;
+      color: #a2d69f;
+      border: 1px solid #282420;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>偉特地景・生版畫視覺校調儀</h1>
+    <p>地貌 × 出口 × 人物 絕對座標校準</p>
+  </header>
+
+  <div class="workbench">
+    <div class="stage-container">
+      <canvas id="tarotCanvas" width="1200" height="800"></canvas>
+    </div>
+
+    <div class="controls-panel">
+      <!-- 素材下拉選單 -->
+      <div class="selector-grid">
+        <div class="control-group">
+          <label>天空 (Sky)</label>
+          <select id="selSky">
+            <option value="sky_gold">金黃天光 (sky_gold)</option>
+            <option value="sky_night">幽暗夜空 (sky_night / 水平鏡像)</option>
+            <option value="sky_sunset">落日餘暉 (sky_sunset)</option>
+            <option value="sky_storm">風暴雷雲 (sky_storm)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>地貌 (Ground)</label>
+          <select id="selGround">
+            <option value="ground_terrace">石階高台 (ground_terrace)</option>
+            <option value="ground_hill">起伏山丘 (ground_hill)</option>
+            <option value="ground_cliff">荒蕪峭壁 (ground_cliff)</option>
+            <option value="ground_water">幽暗水岸 (ground_water)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>生路出口 (Exit)</label>
+          <select id="selExit">
+            <option value="exit_arch">雙塔石門 (exit_arch)</option>
+            <option value="exit_bridge">跨谷木橋 (exit_bridge)</option>
+            <option value="exit_path">林間小徑 (exit_path)</option>
+            <option value="exit_stream">幽谷溪流 (exit_stream)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>旅人姿態 (Figure)</label>
+          <select id="selFigure">
+            <option value="figure_guard">手持長杖 (figure_guard)</option>
+            <option value="figure_stand">直立眺望 (figure_stand)</option>
+            <option value="figure_sit">席地而坐 (figure_sit)</option>
+            <option value="figure_walk">邁步前行 (figure_walk)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 出口微調控制組 -->
+      <div class="slider-row">
+        <div class="control-group">
+          <label>出口 X 位移 <span class="val" id="valExitX">-44px</span></label>
+          <input type="range" id="rngExitX" min="-300" max="400" step="2" value="-44">
+        </div>
+        <div class="control-group">
+          <label>出口 Y 位移 <span class="val" id="valExitY">-58px</span></label>
+          <input type="range" id="rngExitY" min="-250" max="250" step="2" value="-58">
+        </div>
+        <div class="control-group">
+          <label>出口 縮放比例 <span class="val" id="valExitScale">1.00x</span></label>
+          <input type="range" id="rngExitScale" min="0.6" max="1.5" step="0.02" value="1.00">
+        </div>
+        <div class="control-group">
+          <label>出口 旋轉校準 <span class="val" id="valExitRot">0°</span></label>
+          <input type="range" id="rngExitRot" min="-15" max="15" step="0.5" value="0">
+        </div>
+      </div>
+
+      <!-- 地貌微調控制組 -->
+      <div class="slider-row">
+        <div class="control-group">
+          <label>地貌 寬度比例 <span class="val" id="valGroundW">1.00</span></label>
+          <input type="range" id="rngGroundW" min="0.8" max="1.3" step="0.01" value="1.00">
+        </div>
+        <div class="control-group">
+          <label>地貌 沉降高度比例 <span class="val" id="valGroundH">0.52</span></label>
+          <input type="range" id="rngGroundH" min="0.4" max="0.7" step="0.01" value="0.52">
+        </div>
+        <div class="control-group">
+          <label>旅人 X 位置 <span class="val" id="valFigX">0.08</span></label>
+          <input type="range" id="rngFigX" min="0.02" max="0.35" step="0.01" value="0.08">
+        </div>
+        <div class="control-group">
+          <label>旅人 Y 腳底錨點 <span class="val" id="valFigY">0.90</span></label>
+          <input type="range" id="rngFigY" min="0.75" max="0.98" step="0.01" value="0.90">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button id="btnResetPair" class="primary">套用此組合最佳校準值</button>
+        <button id="btnCopyCoords">複製當前座標參數</button>
+      </div>
+
+      <div class="coords-output" id="outputCoords">
+        Ground: [W:1.00, H:0.52] | Exit: [X:-44, Y:-58, Scale:1.00, Rot:0°] | Fig: [X:0.08, Y:0.90, H:0.38]
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('tarotCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const SKY_TINTS = {
+      'sky_gold': 'rgba(212, 175, 55, 0.08)',
+      'sky_sunset': 'rgba(224, 110, 60, 0.12)',
+      'sky_storm': 'rgba(80, 85, 90, 0.15)',
+      'sky_night': 'rgba(30, 45, 80, 0.16)'
+    };
+
+    const CALIBRATION_PRESETS = {
+      'ground_hill+exit_bridge':    { x: 0,   y: 56,  scale: 1.00, rot: 0 },
+      'ground_water+exit_stream':   { x: 200, y: 56,  scale: 1.00, rot: 0 },
+      'ground_terrace+exit_stream': { x: 230, y: -58, scale: 1.00, rot: 0 },
+      'ground_cliff+exit_arch':     { x: 8,   y: -58, scale: 1.00, rot: 0 },
+      'ground_cliff+exit_path':     { x: 142, y: -58, scale: 1.00, rot: 0 },
+      'ground_terrace+exit_arch':   { x: -44, y: -58, scale: 1.00, rot: 0 },
+      'ground_terrace+exit_bridge': { x: 18,  y: -32, scale: 1.00, rot: 0 },
+      'ground_cliff+exit_bridge':   { x: 0,   y: -30, scale: 1.00, rot: 0 },
+      'ground_hill+exit_path':      { x: 80,  y: 0,   scale: 1.00, rot: 0 },
+      'ground_water+exit_arch':     { x: 0,   y: 0,   scale: 1.00, rot: 0 }
+    };
+
+    const imageCache = {};
+
+    function loadImage(path) {
+      if (imageCache[path]) return Promise.resolve(imageCache[path]);
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          imageCache[path] = img;
+          resolve(img);
+        };
+        img.onerror = () => {
+          const fallback = path.startsWith('/') ? path.substring(1) : '/' + path;
+          const retryImg = new Image();
+          retryImg.crossOrigin = 'anonymous';
+          retryImg.onload = () => {
+            imageCache[path] = retryImg;
+            resolve(retryImg);
+          };
+          retryImg.onerror = () => resolve(null);
+          retryImg.src = fallback;
+        };
+        img.src = path;
+      });
+    }
+
+    // 精準除渣濾網：消除白塊與假棋盤格，同時絕對保護石門拱洞中央的高光核心
+    function purgeArtifacts(sourceImg, isExit = false) {
+      if (!sourceImg) return null;
+      const w = sourceImg.naturalWidth || sourceImg.width;
+      const h = sourceImg.naturalHeight || sourceImg.height;
+      if (!w || !h) return sourceImg;
+
+      const memCanvas = document.createElement('canvas');
+      memCanvas.width = w;
+      memCanvas.height = h;
+      const memCtx = memCanvas.getContext('2d');
+      memCtx.drawImage(sourceImg, 0, 0);
+
+      try {
+        const imgData = memCtx.getImageData(0, 0, w, h);
+        const d = imgData.data;
+
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const idx = (y * w + x) * 4;
+            const r = d[idx];
+            const g = d[idx + 1];
+            const b = d[idx + 2];
+
+            // 若為石門，保護拱洞核心區域（中下半部區域不挖空白光）
+            if (isExit) {
+              const inPortalZone = (x > w * 0.35 && x < w * 0.65 && y > h * 0.35 && y < h * 0.85);
+              if (inPortalZone) {
+                continue; // 門洞高光完整保留！
+              }
+            }
+
+            // 1. 純白底消除 (r, g, b > 235 且無飽和度)
+            const isWhite = (r > 232 && g > 232 && b > 232 && Math.abs(r - g) < 14 && Math.abs(g - b) < 14);
+
+            // 2. 假棋盤格消除 (純黑格或極淺灰格)
+            const isDarkSquare = (r < 35 && g < 35 && b < 35);
+            const isLightSquare = (r > 218 && g > 218 && b > 218 && Math.abs(r - g) < 10 && Math.abs(g - b) < 10);
+
+            if (isWhite || isDarkSquare || isLightSquare) {
+              d[idx + 3] = 0; // Alpha 轉為 100% 透明
+            }
+          }
+        }
+        memCtx.putImageData(imgData, 0, 0);
+        return memCanvas;
+      } catch (e) {
+        return sourceImg;
+      }
+    }
+
+    const selSky = document.getElementById('selSky');
+    const selGround = document.getElementById('selGround');
+    const selExit = document.getElementById('selExit');
+    const selFigure = document.getElementById('selFigure');
+
+    const rngExitX = document.getElementById('rngExitX');
+    const rngExitY = document.getElementById('rngExitY');
+    const rngExitScale = document.getElementById('rngExitScale');
+    const rngExitRot = document.getElementById('rngExitRot');
+
+    const rngGroundW = document.getElementById('rngGroundW');
+    const rngGroundH = document.getElementById('rngGroundH');
+    const rngFigX = document.getElementById('rngFigX');
+    const rngFigY = document.getElementById('rngFigY');
+
+    const valExitX = document.getElementById('valExitX');
+    const valExitY = document.getElementById('valExitY');
+    const valExitScale = document.getElementById('valExitScale');
+    const valExitRot = document.getElementById('valExitRot');
+
+    const valGroundW = document.getElementById('valGroundW');
+    const valGroundH = document.getElementById('valGroundH');
+    const valFigX = document.getElementById('valFigX');
+    const valFigY = document.getElementById('valFigY');
+
+    const outputCoords = document.getElementById('outputCoords');
+    const btnResetPair = document.getElementById('btnResetPair');
+    const btnCopyCoords = document.getElementById('btnCopyCoords');
+
+    function applyBestPreset(silent = false) {
+      const pairKey = `${selGround.value}+${selExit.value}`;
+      const preset = CALIBRATION_PRESETS[pairKey];
+      if (preset) {
+        rngExitX.value = preset.x;
+        rngExitY.value = preset.y;
+        rngExitScale.value = preset.scale;
+        rngExitRot.value = preset.rot;
+      } else {
+        if (!silent) {
+          rngExitX.value = 0;
+          rngExitY.value = 0;
+          rngExitScale.value = 1.00;
+          rngExitRot.value = 0;
+        }
+      }
+      updateLabels();
+      liveRender();
+    }
+
+    function updateLabels() {
+      valExitX.textContent = `${rngExitX.value}px`;
+      valExitY.textContent = `${rngExitY.value}px`;
+      valExitScale.textContent = `${parseFloat(rngExitScale.value).toFixed(2)}x`;
+      valExitRot.textContent = `${rngExitRot.value}°`;
+
+      valGroundW.textContent = parseFloat(rngGroundW.value).toFixed(2);
+      valGroundH.textContent = parseFloat(rngGroundH.value).toFixed(2);
+      valFigX.textContent = parseFloat(rngFigX.value).toFixed(2);
+      valFigY.textContent = parseFloat(rngFigY.value).toFixed(2);
+
+      outputCoords.textContent = 
+        `Ground: [W:${valGroundW.textContent}, H:${valGroundH.textContent}] | ` +
+        `Exit: [X:${rngExitX.value}, Y:${rngExitY.value}, Scale:${valExitScale.textContent.replace('x','')}, Rot:${rngExitRot.value}°] | ` +
+        `Fig: [X:${valFigX.textContent}, Y:${valFigY.textContent}, H:0.38]`;
+    }
+
+    async function liveRender() {
       const sky = selSky.value;
       const ground = selGround.value;
       const exit = selExit.value;
@@ -21,17 +486,13 @@ async function liveRender() {
         loadImage(`/assets/figures/${figure}.png`)
       ]);
 
-      // 天空、出口、地貌保留原始完整色調（不挖空亮部白光）
       const imgSky = rawSky;
-      const imgExit = rawExit;
-      const imgGround = rawGround;
-      // 僅對旅人做邊緣白框防禦，若旅人也已去背乾淨可直接用 rawFigure
-      const imgFigure = rawFigure;
+      const imgExit = purgeArtifacts(rawExit, true);   // 排除拱門高光保護
+      const imgGround = purgeArtifacts(rawGround, false);
+      const imgFigure = purgeArtifacts(rawFigure, false); // 徹底清除旅人四周純白大框
 
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#e8e0cc';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const margin = 28;
       const innerW = canvas.width - margin * 2;
@@ -55,7 +516,7 @@ async function liveRender() {
         ctx.restore();
       }
 
-      // 2. 出口（退後，石門中心白光完整保留不被鏤空）
+      // 2. 出口（退後：拱門透光飽滿扎實，上方棋盤格徹底清除）
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -80,7 +541,7 @@ async function liveRender() {
         ctx.restore();
       }
 
-      // 4. 古典天光染色
+      // 4. 古典環境天光浸染 (Multiply)
       if (SKY_TINTS && SKY_TINTS[sky]) {
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
@@ -89,11 +550,11 @@ async function liveRender() {
         ctx.restore();
       }
 
-      // 5. 旅人姿態
+      // 5. 旅人立像（乾淨無白框置於最前）
       if (imgFigure) {
         ctx.save();
         const figH_px = innerH * 0.38;
-        const figAspect = (imgFigure.naturalWidth / imgFigure.naturalHeight) || 0.6;
+        const figAspect = (imgFigure.width / imgFigure.height) || 0.6;
         const figW_px = figH_px * figAspect;
         const figPosX = margin + innerW * figX;
         const figPosY = margin + innerH * figY - figH_px;
@@ -103,7 +564,7 @@ async function liveRender() {
 
       ctx.restore();
 
-      // 6. 偉特雙黑框
+      // 6. 1909 偉特雙黑線框
       ctx.save();
       ctx.strokeStyle = '#2b261f';
       ctx.lineWidth = 4;
@@ -112,3 +573,34 @@ async function liveRender() {
       ctx.strokeRect(margin - 8, margin - 8, innerW + 16, innerH + 16);
       ctx.restore();
     }
+
+    [selGround, selExit].forEach(el => {
+      el.addEventListener('change', () => applyBestPreset(false));
+    });
+
+    [selSky, selFigure].forEach(el => {
+      el.addEventListener('change', liveRender);
+    });
+
+    [rngExitX, rngExitY, rngExitScale, rngExitRot, rngGroundW, rngGroundH, rngFigX, rngFigY].forEach(slider => {
+      slider.addEventListener('input', () => {
+        updateLabels();
+        liveRender();
+      });
+    });
+
+    btnResetPair.addEventListener('click', () => applyBestPreset(false));
+
+    btnCopyCoords.addEventListener('click', () => {
+      navigator.clipboard.writeText(outputCoords.textContent).then(() => {
+        const orig = btnCopyCoords.textContent;
+        btnCopyCoords.textContent = '已複製到剪貼簿！';
+        setTimeout(() => btnCopyCoords.textContent = orig, 1500);
+      });
+    });
+
+    updateLabels();
+    applyBestPreset(true);
+  </script>
+</body>
+</html>
