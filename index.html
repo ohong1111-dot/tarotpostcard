@@ -334,12 +334,28 @@
       ctx.rect(margin, margin, innerW, innerH);
       ctx.clip();
 
-      // 1. 天空滿版鋪底
+// 1. 天空滿版鋪底
       if (imgSky) {
         ctx.drawImage(imgSky, margin, margin, innerW, innerH);
       }
 
-      // 2. 地貌（可調整寬度與垂直沉降）
+      // 2. 出口（改為先畫！退到地貌後方，起點生硬白邊由地貌遮蔽）
+      if (imgExit) {
+        ctx.save();
+        const anchorX = margin + innerW * 0.80;
+        const anchorY = margin + innerH * 0.75;
+
+        ctx.translate(anchorX + exitX, anchorY + exitY);
+        ctx.rotate((exitRot * Math.PI) / 180);
+        ctx.scale(exitScale, exitScale);
+        ctx.translate(-anchorX, -anchorY);
+
+        ctx.globalAlpha = 0.98;
+        ctx.drawImage(imgExit, margin, margin, innerW, innerH);
+        ctx.restore();
+      }
+
+      // 3. 地貌（改為後畫！覆蓋在出口前面，石階/礫石自然遮住橋腳與小徑底）
       if (imgGround) {
         ctx.save();
         const groundDrawW = innerW * gW;
@@ -349,26 +365,16 @@
         ctx.restore();
       }
 
-      // 3. 出口（滿版定錨基準 + 偏移/縮放/旋轉）
-      if (imgExit) {
+      // 4. 古典環境天光浸染（調和天空色溫，壓制刺眼死白）
+      if (typeof SKY_TINTS !== 'undefined' && SKY_TINTS[sky]) {
         ctx.save();
-        // 以右下地平交界 (約 80% 寬度, 75% 高度) 為縮放與旋轉中心點
-        const anchorX = margin + innerW * 0.80;
-        const anchorY = margin + innerH * 0.75;
-
-        // 位移至中心點
-        ctx.translate(anchorX + exitX, anchorY + exitY);
-        ctx.rotate((exitRot * Math.PI) / 180);
-        ctx.scale(exitScale, exitScale);
-        ctx.translate(-anchorX, -anchorY);
-
-        ctx.globalAlpha = 0.98;
-        // 滿版疊印
-        ctx.drawImage(imgExit, margin, margin, innerW, innerH);
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = SKY_TINTS[sky];
+        ctx.fillRect(margin, margin, innerW, innerH);
         ctx.restore();
       }
 
-      // 4. 旅人（精確鎖定座標）
+      // 5. 旅人（置於最前景）
       if (imgFigure) {
         ctx.save();
         const figureHeight = innerH * figH;
@@ -380,8 +386,6 @@
         ctx.drawImage(imgFigure, figurePosX, figurePosY, figureWidth, figureHeight);
         ctx.restore();
       }
-
-      ctx.restore();
 
       // 偉特雙層框線
       ctx.strokeStyle = "#2b261f";
