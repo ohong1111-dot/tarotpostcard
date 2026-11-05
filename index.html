@@ -209,9 +209,10 @@
         <div class="control-group">
           <label>天空 (Sky)</label>
           <select id="selSky">
-            <option value="sky_day">金黃暮日 (sky_day)</option>
-            <option value="sky_night">幽暗夜空 (sky_night / 自動鏡像)</option>
+            <option value="sky_gold">金黃天光 (sky_gold)</option>
+            <option value="sky_night">幽暗夜空 (sky_night / 水平鏡像)</option>
             <option value="sky_sunset">落日餘暉 (sky_sunset)</option>
+            <option value="sky_storm">風暴雷雲 (sky_storm)</option>
           </select>
         </div>
 
@@ -238,8 +239,10 @@
         <div class="control-group">
           <label>旅人姿態 (Figure)</label>
           <select id="selFigure">
-            <option value="figure_wand">手持長杖 (figure_wand)</option>
+            <option value="figure_guard">手持長杖 (figure_guard)</option>
             <option value="figure_stand">直立眺望 (figure_stand)</option>
+            <option value="figure_sit">席地而坐 (figure_sit)</option>
+            <option value="figure_walk">邁步前行 (figure_walk)</option>
           </select>
         </div>
       </div>
@@ -247,12 +250,12 @@
       <!-- 出口微調控制組 -->
       <div class="slider-row">
         <div class="control-group">
-          <label>出口 X 位移 <span class="val" id="valExitX">0px</span></label>
-          <input type="range" id="rngExitX" min="-300" max="400" step="2" value="0">
+          <label>出口 X 位移 <span class="val" id="valExitX">-44px</span></label>
+          <input type="range" id="rngExitX" min="-300" max="400" step="2" value="-44">
         </div>
         <div class="control-group">
-          <label>出口 Y 位移 <span class="val" id="valExitY">0px</span></label>
-          <input type="range" id="rngExitY" min="-250" max="250" step="2" value="0">
+          <label>出口 Y 位移 <span class="val" id="valExitY">-58px</span></label>
+          <input type="range" id="rngExitY" min="-250" max="250" step="2" value="-58">
         </div>
         <div class="control-group">
           <label>出口 縮放比例 <span class="val" id="valExitScale">1.00x</span></label>
@@ -290,7 +293,7 @@
       </div>
 
       <div class="coords-output" id="outputCoords">
-        Ground: [W:1.00, H:0.52] | Exit: [X:0, Y:0, Scale:1.00, Rot:0°] | Fig: [X:0.08, Y:0.90, H:0.38]
+        Ground: [W:1.00, H:0.52] | Exit: [X:-44, Y:-58, Scale:1.00, Rot:0°] | Fig: [X:0.08, Y:0.90, H:0.38]
       </div>
     </div>
   </div>
@@ -301,8 +304,9 @@
 
     // 古典環境光染色設定（Multiply 均勻浸染）
     const SKY_TINTS = {
-      'sky_day': 'rgba(212, 175, 55, 0.08)',
+      'sky_gold': 'rgba(212, 175, 55, 0.08)',
       'sky_sunset': 'rgba(224, 110, 60, 0.12)',
+      'sky_storm': 'rgba(80, 85, 90, 0.15)',
       'sky_night': 'rgba(30, 45, 80, 0.16)'
     };
 
@@ -370,7 +374,6 @@
     const btnResetPair = document.getElementById('btnResetPair');
     const btnCopyCoords = document.getElementById('btnCopyCoords');
 
-    // 依據地貌與出口組合自動載入已記錄的最佳參數
     function applyBestPreset(silent = false) {
       const pairKey = `${selGround.value}+${selExit.value}`;
       const preset = CALIBRATION_PRESETS[pairKey];
@@ -408,7 +411,6 @@
         `Fig: [X:${valFigX.textContent}, Y:${valFigY.textContent}, H:0.38]`;
     }
 
-    // 核心即時渲染函式
     async function liveRender() {
       const sky = selSky.value;
       const ground = selGround.value;
@@ -426,7 +428,7 @@
       const figY = parseFloat(rngFigY.value);
       const figH = 0.38;
 
-      // 載入當前素材
+      // 載入當前素材（完全對齊真實檔名）
       const [imgSky, imgExit, imgGround, imgFigure] = await Promise.all([
         loadImage(`assets/skies/${sky}.png`),
         loadImage(`assets/exits/${exit}.png`),
@@ -434,12 +436,10 @@
         loadImage(`assets/figures/${figure}.png`)
       ]);
 
-      // 畫布基礎設定
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#e8e0cc';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 外框與安全邊距（偉特雙線邊界）
       const margin = 28;
       const innerW = canvas.width - margin * 2;
       const innerH = canvas.height - margin * 2;
@@ -447,9 +447,9 @@
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip(); // 限制所有圖層都在古典畫框內部
+      ctx.clip();
 
-      // 1. 天空滿版鋪底（夜空自動鏡像反轉至左側）
+      // 1. 天空滿版鋪底（若是夜空，水平鏡像）
       if (imgSky) {
         ctx.save();
         if (sky === 'sky_night') {
@@ -462,7 +462,7 @@
         ctx.restore();
       }
 
-      // 2. 生路出口（先畫！退到地貌後方，起點白邊與石基由地貌遮掩）
+      // 2. 出口（先畫！退到地貌後方，起點由地貌自然遮蔽）
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -478,7 +478,7 @@
         ctx.restore();
       }
 
-      // 3. 地貌前景（後畫！覆蓋在出口之上，石階/水岸/岩壁作為天然遮罩）
+      // 3. 地貌前景（後畫！覆蓋在出口前面）
       if (imgGround) {
         ctx.save();
         const groundDrawW = innerW * gW;
@@ -488,7 +488,7 @@
         ctx.restore();
       }
 
-      // 4. 古典環境天光浸染（均勻調和天空、出口與地貌色溫）
+      // 4. 古典環境天光浸染
       if (SKY_TINTS[sky]) {
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
@@ -497,7 +497,7 @@
         ctx.restore();
       }
 
-      // 5. 旅人立像（置於最前景）
+      // 5. 旅人姿態（最前景）
       if (imgFigure) {
         ctx.save();
         const figureHeight = innerH * figH;
@@ -510,9 +510,9 @@
         ctx.restore();
       }
 
-      ctx.restore(); // 釋放 clip
+      ctx.restore();
 
-      // 6. 繪製 1909 正統版畫黑線雙框
+      // 6. 1909 偉特古典雙黑線邊框
       ctx.save();
       ctx.strokeStyle = '#2b261f';
       ctx.lineWidth = 4;
@@ -522,7 +522,6 @@
       ctx.restore();
     }
 
-    // 事件監聽綁定
     [selGround, selExit].forEach(el => {
       el.addEventListener('change', () => applyBestPreset(false));
     });
@@ -548,7 +547,6 @@
       });
     });
 
-    // 初始啟動
     updateLabels();
     applyBestPreset(true);
   </script>
