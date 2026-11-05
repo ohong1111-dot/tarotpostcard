@@ -1,344 +1,458 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>偉特地景・載具校準與無誤版面調校系統</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>偉特地景・生版畫視覺校調儀</title>
   <style>
     :root {
-      --bg-color: #171615;
-      --card-bg: #23211f;
-      --text-main: #f5f2eb;
-      --accent-gold: #c5a059;
-      --border-color: #3d3a36;
-      --cinnabar-red: #8a3324;
-      --text-muted: #a8a29e;
+      --bg-wood: #1e1b18;
+      --panel-bg: #2a2521;
+      --border-parchment: #c2b490;
+      --accent-gold: #d4af37;
+      --text-main: #f5f0e6;
+      --text-muted: #b8ad9e;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
     body {
-      background-color: var(--bg-color);
+      background-color: var(--bg-wood);
       color: var(--text-main);
-      font-family: "PingFang TC", "Microsoft JhengHei", -apple-system, sans-serif;
+      font-family: "PingFang TC", "Noto Sans TC", "Songti TC", serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 16px 60px;
+      padding: 24px 16px;
     }
 
-    header { text-align: center; margin-bottom: 18px; }
-    h1 { font-size: 1.55rem; color: var(--accent-gold); letter-spacing: 0.15em; margin-bottom: 6px; }
-    p.subtitle { font-size: 0.86rem; color: var(--text-muted); }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-    .main-container {
+    header h1 {
+      font-size: 1.5rem;
+      letter-spacing: 0.15em;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .workbench {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px;
+      gap: 24px;
       width: 100%;
-      max-width: 840px;
+      max-width: 1080px;
     }
 
-    /* 畫布容器 */
-    .canvas-wrapper {
-      background-color: #fdf9f0;
+    /* 畫布工作區 */
+    .stage-container {
+      position: relative;
+      background: #151311;
+      padding: 12px;
+      border: 1px solid #4a4035;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 0 1px #000;
       border-radius: 4px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
-      overflow: hidden;
-      width: 100%;
-      aspect-ratio: 3 / 2;
     }
-    canvas { width: 100%; height: 100%; display: block; }
 
-    /* 按鈕 */
-    .controls { display: flex; flex-direction: column; width: 100%; gap: 10px; }
-    button {
-      padding: 13px 20px; font-size: 0.95rem; border: 1px solid var(--accent-gold);
-      background: transparent; color: var(--accent-gold); border-radius: 2px;
-      cursor: pointer; letter-spacing: 0.1em; transition: all 0.2s ease;
+    canvas {
+      display: block;
+      background-color: #e8e0cc;
+      max-width: 100%;
+      height: auto;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
     }
-    button:hover { background: var(--accent-gold); color: #171615; }
-    button.btn-primary { background: var(--cinnabar-red); border-color: var(--cinnabar-red); color: #fff; }
-    button.btn-primary:hover { background: #a33e2c; border-color: #a33e2c; }
 
-    /* 精確校準面板 */
-    .tuner-panel {
+    /* 控制面板區 */
+    .controls-panel {
       width: 100%;
-      background: #1f1d1a;
-      border: 1px solid var(--accent-gold);
-      padding: 18px 20px;
+      background: var(--panel-bg);
+      border: 1px solid #4a4035;
       border-radius: 4px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
-    .tuner-panel h3 {
-      font-size: 0.95rem; color: var(--accent-gold); display: flex;
-      justify-content: space-between; align-items: center;
+    .selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
     }
 
-    .tuner-selectors {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px;
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .tuner-selectors select {
-      background: #121110; border: 1px solid var(--border-color);
-      color: #fff; padding: 8px 10px; font-size: 0.85rem; border-radius: 2px; outline: none;
+    .control-group label {
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
     }
 
-    .section-title {
-      font-size: 0.82rem; color: var(--accent-gold); margin-top: 4px; font-weight: 600;
-      border-bottom: 1px solid #333; padding-bottom: 4px;
+    .control-group label span.val {
+      color: var(--text-muted);
+      font-family: monospace;
     }
 
-    .sliders-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px;
-      background: rgba(0,0,0,0.25); padding: 12px; border-radius: 3px;
+    select, input[type="range"], button {
+      background: #181513;
+      border: 1px solid #5a4e40;
+      color: var(--text-main);
+      padding: 8px 10px;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      outline: none;
+      transition: all 0.2s;
     }
 
-    .slider-item { display: flex; flex-direction: column; gap: 4px; }
-    .slider-item label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
-    .slider-item label span { color: var(--accent-gold); font-family: monospace; }
-    .slider-item input[type="range"] { width: 100%; accent-color: var(--accent-gold); cursor: pointer; }
+    select:focus, button:focus {
+      border-color: var(--accent-gold);
+    }
 
-    .code-export {
-      background: #121110; border: 1px dashed #444; padding: 10px;
-      font-size: 0.78rem; color: #9cdcfe; font-family: monospace; white-space: pre-wrap; word-break: break-all;
+    .slider-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      background: #201c18;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #383028;
+    }
+
+    input[type="range"] {
+      padding: 0;
+      height: 6px;
+      cursor: pointer;
+      accent-color: var(--accent-gold);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 500;
+      padding: 8px 18px;
+      background: #3a322b;
+      border-color: #6a5a4a;
+    }
+
+    button:hover {
+      background: #4a4037;
+      color: var(--accent-gold);
+      border-color: var(--accent-gold);
+    }
+
+    button.primary {
+      background: #7a2b22;
+      border-color: #a83c30;
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: #96352a;
+      border-color: #d14b3d;
+    }
+
+    .coords-output {
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: #141210;
+      padding: 10px 14px;
+      border-radius: 3px;
+      color: #a2d69f;
+      border: 1px solid #282420;
+      word-break: break-all;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>偉特地景・全版面視覺精確調校盤</h1>
-    <p class="subtitle">地貌 × 出口 × 人物 絕對座標校準</p>
+    <h1>偉特地景・生版畫視覺校調儀</h1>
+    <p>地貌 × 出口 × 人物 絕對座標校準</p>
   </header>
 
-  <div class="main-container">
-    <div class="canvas-wrapper">
-      <canvas id="postcardCanvas" width="1200" height="800"></canvas>
+  <div class="workbench">
+    <div class="stage-container">
+      <canvas id="tarotCanvas" width="1200" height="800"></canvas>
     </div>
 
-    <div class="controls">
-      <button class="btn-primary" onclick="resetToDefaults()">重設為滿版最佳預設值</button>
-    </div>
+    <div class="controls-panel">
+      <!-- 元素挑選下拉選單 -->
+      <div class="selector-grid">
+        <div class="control-group">
+          <label>天空 (Sky)</label>
+          <select id="selSky">
+            <option value="sky_day">金黃暮日 (sky_day)</option>
+            <option value="sky_night">幽暗夜空 (sky_night / 自動鏡像)</option>
+            <option value="sky_sunset">落日餘暉 (sky_sunset)</option>
+          </select>
+        </div>
 
-    <!-- 視覺調校盤 -->
-    <div class="tuner-panel">
-      <h3>
-        <span>圖層切換與三軸精準校準</span>
-        <span style="font-size: 0.78rem; font-weight: normal; color: var(--text-muted);">滿版定錨・滑桿平移不跑版</span>
-      </h3>
+        <div class="control-group">
+          <label>地貌 (Ground)</label>
+          <select id="selGround">
+            <option value="ground_terrace">石階高台 (ground_terrace)</option>
+            <option value="ground_hill">起伏山丘 (ground_hill)</option>
+            <option value="ground_cliff">荒蕪峭壁 (ground_cliff)</option>
+            <option value="ground_water">幽暗水岸 (ground_water)</option>
+          </select>
+        </div>
 
-      <div class="tuner-selectors">
-        <div>
-          <label style="font-size: 0.75rem; color:#888;">天空 (Sky)</label>
-          <select id="tuneSky" onchange="liveRender()">
-            <option value="sky_storm">風暴前夕 (storm)</option>
-            <option value="sky_sunset">落日餘暉 (sunset)</option>
-            <option value="sky_gold">暮日晨光 (gold)</option>
-            <option value="sky_night">深藍子夜 (night)</option>
+        <div class="control-group">
+          <label>生路出口 (Exit)</label>
+          <select id="selExit">
+            <option value="exit_arch">雙塔石門 (exit_arch)</option>
+            <option value="exit_bridge">跨谷木橋 (exit_bridge)</option>
+            <option value="exit_path">林間小徑 (exit_path)</option>
+            <option value="exit_stream">幽谷溪流 (exit_stream)</option>
           </select>
         </div>
-        <div>
-          <label style="font-size: 0.75rem; color:#888;">地貌 (Ground)</label>
-          <select id="tuneGround" onchange="liveRender()">
-            <option value="ground_terrace">石階高台 (terrace)</option>
-            <option value="ground_hill">蒼茫起伏山丘 (hill)</option>
-            <option value="ground_cliff">荒蕪峭壁 (cliff)</option>
-            <option value="ground_water">幽暗水岸 (water)</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size: 0.75rem; color:#888;">生路出口 (Exit)</label>
-          <select id="tuneExit" onchange="liveRender()">
-            <option value="exit_path">林間小徑 / 石階 (path)</option>
-            <option value="exit_stream">幽谷溪流 (stream)</option>
-            <option value="exit_bridge">跨谷木橋 (bridge)</option>
-            <option value="exit_arch">雙塔石門 (arch)</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size: 0.75rem; color:#888;">旅人姿態 (Figure)</label>
-          <select id="tuneFigure" onchange="liveRender()">
-            <option value="figure_guard">持杖防禦 (guard)</option>
-            <option value="figure_walk">啟程涉足 (walk)</option>
-            <option value="figure_stand">佇立凝視 (stand)</option>
-            <option value="figure_sit">盤坐靜觀 (sit)</option>
+
+        <div class="control-group">
+          <label>旅人姿態 (Figure)</label>
+          <select id="selFigure">
+            <option value="figure_wand">手持長杖 (figure_wand)</option>
+            <option value="figure_stand">直立眺望 (figure_stand)</option>
           </select>
         </div>
       </div>
 
-      <!-- 地面 (Ground) 調整 -->
-      <div class="section-title">1. 地貌校準 (Ground)</div>
-      <div class="sliders-grid">
-        <div class="slider-item">
-          <label>地貌寬度 (Ground Width) <span id="valGW">1.00</span></label>
-          <input type="range" id="paramGW" min="0.60" max="1.00" step="0.01" value="1.00" oninput="liveRender()">
+      <!-- 出口微調控制組 -->
+      <div class="slider-row">
+        <div class="control-group">
+          <label>出口 X 位移 <span class="val" id="valExitX">0px</span></label>
+          <input type="range" id="rngExitX" min="-300" max="400" step="2" value="0">
         </div>
-        <div class="slider-item">
-          <label>地貌垂直高度沉降 (Ground Height) <span id="valGH">0.52</span></label>
-          <input type="range" id="paramGH" min="0.30" max="0.75" step="0.01" value="0.52" oninput="liveRender()">
+        <div class="control-group">
+          <label>出口 Y 位移 <span class="val" id="valExitY">0px</span></label>
+          <input type="range" id="rngExitY" min="-250" max="250" step="2" value="0">
         </div>
-      </div>
-
-      <!-- 出口 (Exit) 調整 -->
-      <div class="section-title">2. 出口校準 (Exit)</div>
-      <div class="sliders-grid">
-        <div class="slider-item">
-          <label>水平位移 (X Offset) <span id="valExitX">0 px</span></label>
-          <input type="range" id="paramExitX" min="-300" max="300" step="2" value="0" oninput="liveRender()">
+        <div class="control-group">
+          <label>出口 縮放比例 <span class="val" id="valExitScale">1.00x</span></label>
+          <input type="range" id="rngExitScale" min="0.6" max="1.5" step="0.02" value="1.00">
         </div>
-        <div class="slider-item">
-          <label>垂直位移 (Y Offset) <span id="valExitY">0 px</span></label>
-          <input type="range" id="paramExitY" min="-200" max="200" step="2" value="0" oninput="liveRender()">
-        </div>
-        <div class="slider-item">
-          <label>整體縮放 (Exit Scale) <span id="valExitScale">1.00x</span></label>
-          <input type="range" id="paramExitScale" min="0.60" max="1.40" step="0.02" value="1.00" oninput="liveRender()">
-        </div>
-        <div class="slider-item">
-          <label>旋轉角度 (Exit Rotate) <span id="valExitRot">0°</span></label>
-          <input type="range" id="paramExitRot" min="-20" max="20" step="0.5" value="0" oninput="liveRender()">
+        <div class="control-group">
+          <label>出口 旋轉校準 <span class="val" id="valExitRot">0°</span></label>
+          <input type="range" id="rngExitRot" min="-15" max="15" step="0.5" value="0">
         </div>
       </div>
 
-      <!-- 人物 (Figure) 調整 -->
-      <div class="section-title">3. 人物校準 (Figure)</div>
-      <div class="sliders-grid">
-        <div class="slider-item">
-          <label>人物水平位置 (Figure X) <span id="valFigX">0.08</span></label>
-          <input type="range" id="paramFigX" min="0.02" max="0.35" step="0.01" value="0.08" oninput="liveRender()">
+      <!-- 地貌微調控制組 -->
+      <div class="slider-row">
+        <div class="control-group">
+          <label>地貌 寬度比例 <span class="val" id="valGroundW">1.00</span></label>
+          <input type="range" id="rngGroundW" min="0.8" max="1.3" step="0.01" value="1.00">
         </div>
-        <div class="slider-item">
-          <label>人物垂直貼地 (Figure Y) <span id="valFigY">0.90</span></label>
-          <input type="range" id="paramFigY" min="0.70" max="0.98" step="0.01" value="0.90" oninput="liveRender()">
+        <div class="control-group">
+          <label>地貌 沉降高度比例 <span class="val" id="valGroundH">0.52</span></label>
+          <input type="range" id="rngGroundH" min="0.4" max="0.7" step="0.01" value="0.52">
         </div>
-        <div class="slider-item">
-          <label>人物大小 (Figure Size) <span id="valFigH">0.38</span></label>
-          <input type="range" id="paramFigH" min="0.20" max="0.55" step="0.01" value="0.38" oninput="liveRender()">
+        <div class="control-group">
+          <label>旅人 X 位置 <span class="val" id="valFigX">0.08</span></label>
+          <input type="range" id="rngFigX" min="0.02" max="0.35" step="0.01" value="0.08">
+        </div>
+        <div class="control-group">
+          <label>旅人 Y 腳底錨點 <span class="val" id="valFigY">0.90</span></label>
+          <input type="range" id="rngFigY" min="0.75" max="0.98" step="0.01" value="0.90">
         </div>
       </div>
 
-      <div>
-        <label style="font-size: 0.75rem; color:#888;">當前最佳數值代碼（調好滿意後複製）：</label>
-        <div class="code-export" id="codeExport"></div>
+      <div class="btn-row">
+        <button id="btnResetPair" class="primary">套用此組合最佳校準值</button>
+        <button id="btnCopyCoords">複製當前座標參數</button>
+      </div>
+
+      <div class="coords-output" id="outputCoords">
+        Ground: [W:1.00, H:0.52] | Exit: [X:0, Y:0, Scale:1.00, Rot:0°] | Fig: [X:0.08, Y:0.90, H:0.38]
       </div>
     </div>
   </div>
 
   <script>
-    const canvas = document.getElementById('postcardCanvas');
+    const canvas = document.getElementById('tarotCanvas');
     const ctx = canvas.getContext('2d');
 
-    const cache = {};
-    function loadImage(src) {
-      if (cache[src]) return Promise.resolve(cache[src]);
+    // 古典環境光染色設定（Multiply 均勻浸染）
+    const SKY_TINTS = {
+      'sky_day': 'rgba(212, 175, 55, 0.08)',
+      'sky_sunset': 'rgba(224, 110, 60, 0.12)',
+      'sky_night': 'rgba(30, 45, 80, 0.16)'
+    };
+
+    // 已驗證的最佳座標資料庫 (Ground + Exit)
+    const CALIBRATION_PRESETS = {
+      'ground_hill+exit_bridge':    { x: 0,   y: 56,  scale: 1.00, rot: 0 },
+      'ground_water+exit_stream':   { x: 200, y: 56,  scale: 1.00, rot: 0 },
+      'ground_terrace+exit_stream': { x: 230, y: -58, scale: 1.00, rot: 0 },
+      'ground_cliff+exit_arch':     { x: 8,   y: -58, scale: 1.00, rot: 0 },
+      'ground_cliff+exit_path':     { x: 142, y: -58, scale: 1.00, rot: 0 },
+      'ground_terrace+exit_arch':   { x: -44, y: -58, scale: 1.00, rot: 0 },
+      'ground_terrace+exit_bridge': { x: 18,  y: -32, scale: 1.00, rot: 0 },
+      'ground_cliff+exit_bridge':   { x: 0,   y: -30, scale: 1.00, rot: 0 },
+      'ground_hill+exit_path':      { x: 80,  y: 0,   scale: 1.00, rot: 0 },
+      'ground_water+exit_arch':     { x: 0,   y: 0,   scale: 1.00, rot: 0 }
+    };
+
+    // 快取圖檔容器
+    const imageCache = {};
+
+    function loadImage(url) {
+      if (imageCache[url]) return Promise.resolve(imageCache[url]);
       return new Promise((resolve) => {
         const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = src;
-        img.onload = () => { cache[src] = img; resolve(img); };
-        img.onerror = () => resolve(null);
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          imageCache[url] = img;
+          resolve(img);
+        };
+        img.onerror = () => {
+          console.warn('載入圖檔失敗或不存在:', url);
+          resolve(null);
+        };
+        img.src = url;
       });
     }
 
-    function createTransparentCanvas(img) {
-      if (!img) return null;
-      const off = document.createElement('canvas');
-      off.width = img.naturalWidth || img.width;
-      off.height = img.naturalHeight || img.height;
-      const oCtx = off.getContext('2d');
-      oCtx.drawImage(img, 0, 0);
-      try {
-        const imgData = oCtx.getImageData(0, 0, off.width, off.height);
-        const d = imgData.data;
-        for (let i = 0; i < d.length; i += 4) {
-          if (d[i] > 220 && d[i+1] > 220 && d[i+2] > 220) d[i+3] = 0;
-        }
-        oCtx.putImageData(imgData, 0, 0);
-        return off;
-      } catch(e) { return img; }
-    }
+    // 控制項 DOM
+    const selSky = document.getElementById('selSky');
+    const selGround = document.getElementById('selGround');
+    const selExit = document.getElementById('selExit');
+    const selFigure = document.getElementById('selFigure');
 
-    function resetToDefaults() {
-      document.getElementById('paramGW').value = 1.00;
-      document.getElementById('paramGH').value = 0.52;
-      document.getElementById('paramExitX').value = 0;
-      document.getElementById('paramExitY').value = 0;
-      document.getElementById('paramExitScale').value = 1.00;
-      document.getElementById('paramExitRot').value = 0;
-      document.getElementById('paramFigX').value = 0.08;
-      document.getElementById('paramFigY').value = 0.90;
-      document.getElementById('paramFigH').value = 0.38;
+    const rngExitX = document.getElementById('rngExitX');
+    const rngExitY = document.getElementById('rngExitY');
+    const rngExitScale = document.getElementById('rngExitScale');
+    const rngExitRot = document.getElementById('rngExitRot');
+
+    const rngGroundW = document.getElementById('rngGroundW');
+    const rngGroundH = document.getElementById('rngGroundH');
+    const rngFigX = document.getElementById('rngFigX');
+    const rngFigY = document.getElementById('rngFigY');
+
+    const valExitX = document.getElementById('valExitX');
+    const valExitY = document.getElementById('valExitY');
+    const valExitScale = document.getElementById('valExitScale');
+    const valExitRot = document.getElementById('valExitRot');
+
+    const valGroundW = document.getElementById('valGroundW');
+    const valGroundH = document.getElementById('valGroundH');
+    const valFigX = document.getElementById('valFigX');
+    const valFigY = document.getElementById('valFigY');
+
+    const outputCoords = document.getElementById('outputCoords');
+    const btnResetPair = document.getElementById('btnResetPair');
+    const btnCopyCoords = document.getElementById('btnCopyCoords');
+
+    // 依據地貌與出口組合自動載入已記錄的最佳參數
+    function applyBestPreset(silent = false) {
+      const pairKey = `${selGround.value}+${selExit.value}`;
+      const preset = CALIBRATION_PRESETS[pairKey];
+      if (preset) {
+        rngExitX.value = preset.x;
+        rngExitY.value = preset.y;
+        rngExitScale.value = preset.scale;
+        rngExitRot.value = preset.rot;
+      } else {
+        if (!silent) {
+          rngExitX.value = 0;
+          rngExitY.value = 0;
+          rngExitScale.value = 1.00;
+          rngExitRot.value = 0;
+        }
+      }
+      updateLabels();
       liveRender();
     }
 
+    function updateLabels() {
+      valExitX.textContent = `${rngExitX.value}px`;
+      valExitY.textContent = `${rngExitY.value}px`;
+      valExitScale.textContent = `${parseFloat(rngExitScale.value).toFixed(2)}x`;
+      valExitRot.textContent = `${rngExitRot.value}°`;
+
+      valGroundW.textContent = parseFloat(rngGroundW.value).toFixed(2);
+      valGroundH.textContent = parseFloat(rngGroundH.value).toFixed(2);
+      valFigX.textContent = parseFloat(rngFigX.value).toFixed(2);
+      valFigY.textContent = parseFloat(rngFigY.value).toFixed(2);
+
+      outputCoords.textContent = 
+        `Ground: [W:${valGroundW.textContent}, H:${valGroundH.textContent}] | ` +
+        `Exit: [X:${rngExitX.value}, Y:${rngExitY.value}, Scale:${valExitScale.textContent.replace('x','')}, Rot:${rngExitRot.value}°] | ` +
+        `Fig: [X:${valFigX.textContent}, Y:${valFigY.textContent}, H:0.38]`;
+    }
+
+    // 核心即時渲染函式
     async function liveRender() {
-      const sky = document.getElementById('tuneSky').value;
-      const ground = document.getElementById('tuneGround').value;
-      const exit = document.getElementById('tuneExit').value;
-      const fig = document.getElementById('tuneFigure').value;
+      const sky = selSky.value;
+      const ground = selGround.value;
+      const exit = selExit.value;
+      const figure = selFigure.value;
 
-      const gW = parseFloat(document.getElementById('paramGW').value);
-      const gH = parseFloat(document.getElementById('paramGH').value);
-      const exitX = parseFloat(document.getElementById('paramExitX').value);
-      const exitY = parseFloat(document.getElementById('paramExitY').value);
-      const exitScale = parseFloat(document.getElementById('paramExitScale').value);
-      const exitRot = parseFloat(document.getElementById('paramExitRot').value);
-      const figX = parseFloat(document.getElementById('paramFigX').value);
-      const figY = parseFloat(document.getElementById('paramFigY').value);
-      const figH = parseFloat(document.getElementById('paramFigH').value);
+      const exitX = parseFloat(rngExitX.value);
+      const exitY = parseFloat(rngExitY.value);
+      const exitScale = parseFloat(rngExitScale.value);
+      const exitRot = parseFloat(rngExitRot.value);
 
-      document.getElementById('valGW').innerText = gW.toFixed(2);
-      document.getElementById('valGH').innerText = gH.toFixed(2);
-      document.getElementById('valExitX').innerText = `${exitX} px`;
-      document.getElementById('valExitY').innerText = `${exitY} px`;
-      document.getElementById('valExitScale').innerText = `${exitScale.toFixed(2)}x`;
-      document.getElementById('valExitRot').innerText = `${exitRot}°`;
-      document.getElementById('valFigX').innerText = figX.toFixed(2);
-      document.getElementById('valFigY').innerText = figY.toFixed(2);
-      document.getElementById('valFigH').innerText = figH.toFixed(2);
+      const gW = parseFloat(rngGroundW.value);
+      const gH = parseFloat(rngGroundH.value);
+      const figX = parseFloat(rngFigX.value);
+      const figY = parseFloat(rngFigY.value);
+      const figH = 0.38;
 
-      document.getElementById('codeExport').innerText = 
-        `Ground: [W:${gW.toFixed(2)}, H:${gH.toFixed(2)}] | Exit: [X:${exitX}, Y:${exitY}, Scale:${exitScale.toFixed(2)}, Rot:${exitRot}°] | Fig: [X:${figX.toFixed(2)}, Y:${figY.toFixed(2)}, H:${figH.toFixed(2)}]`;
-
-      const W = canvas.width;  // 1200
-      const H = canvas.height; // 800
-      ctx.clearRect(0, 0, W, H);
-
-      const [rawSky, rawGround, rawExit, rawFigure] = await Promise.all([
+      // 載入當前素材
+      const [imgSky, imgExit, imgGround, imgFigure] = await Promise.all([
         loadImage(`assets/skies/${sky}.png`),
-        loadImage(`assets/grounds/${ground}.png`),
         loadImage(`assets/exits/${exit}.png`),
-        loadImage(`assets/figures/${fig}.png`)
+        loadImage(`assets/grounds/${ground}.png`),
+        loadImage(`assets/figures/${figure}.png`)
       ]);
 
-      const imgSky = rawSky;
-      const imgGround = createTransparentCanvas(rawGround);
-      const imgExit = createTransparentCanvas(rawExit);
-      const imgFigure = createTransparentCanvas(rawFigure);
+      // 畫布基礎設定
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#e8e0cc';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 底紙
-      ctx.fillStyle = "#fdf9f0";
-      ctx.fillRect(0, 0, W, H);
-
-      const margin = 32;
-      const innerW = W - margin * 2;
-      const innerH = H - margin * 2 - 36;
+      // 外框與安全邊距（偉特雙線邊界）
+      const margin = 28;
+      const innerW = canvas.width - margin * 2;
+      const innerH = canvas.height - margin * 2;
 
       ctx.save();
       ctx.beginPath();
       ctx.rect(margin, margin, innerW, innerH);
-      ctx.clip();
+      ctx.clip(); // 限制所有圖層都在古典畫框內部
 
-// 1. 天空滿版鋪底（若是夜空，自動水平鏡像，將月亮星星移至左側）
+      // 1. 天空滿版鋪底（夜空自動鏡像反轉至左側）
       if (imgSky) {
         ctx.save();
         if (sky === 'sky_night') {
-          // 水平鏡像：向右平移畫布寬度並水平反轉 scale(-1, 1)
           ctx.translate(margin + innerW, margin);
           ctx.scale(-1, 1);
           ctx.drawImage(imgSky, 0, 0, innerW, innerH);
@@ -347,7 +461,8 @@
         }
         ctx.restore();
       }
-      // 2. 出口（改為先畫！退到地貌後方，起點生硬白邊由地貌遮蔽）
+
+      // 2. 生路出口（先畫！退到地貌後方，起點白邊與石基由地貌遮掩）
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -363,7 +478,7 @@
         ctx.restore();
       }
 
-      // 3. 地貌（改為後畫！覆蓋在出口前面，石階/礫石自然遮住橋腳與小徑底）
+      // 3. 地貌前景（後畫！覆蓋在出口之上，石階/水岸/岩壁作為天然遮罩）
       if (imgGround) {
         ctx.save();
         const groundDrawW = innerW * gW;
@@ -373,8 +488,8 @@
         ctx.restore();
       }
 
-      // 4. 古典環境天光浸染（調和天空色溫，壓制刺眼死白）
-      if (typeof SKY_TINTS !== 'undefined' && SKY_TINTS[sky]) {
+      // 4. 古典環境天光浸染（均勻調和天空、出口與地貌色溫）
+      if (SKY_TINTS[sky]) {
         ctx.save();
         ctx.globalCompositeOperation = 'multiply';
         ctx.fillStyle = SKY_TINTS[sky];
@@ -382,7 +497,7 @@
         ctx.restore();
       }
 
-      // 5. 旅人（置於最前景）
+      // 5. 旅人立像（置於最前景）
       if (imgFigure) {
         ctx.save();
         const figureHeight = innerH * figH;
@@ -395,15 +510,47 @@
         ctx.restore();
       }
 
-      // 偉特雙層框線
-      ctx.strokeStyle = "#2b261f";
-      ctx.lineWidth = 3;
+      ctx.restore(); // 釋放 clip
+
+      // 6. 繪製 1909 正統版畫黑線雙框
+      ctx.save();
+      ctx.strokeStyle = '#2b261f';
+      ctx.lineWidth = 4;
       ctx.strokeRect(margin, margin, innerW, innerH);
-      ctx.lineWidth = 1;
-      ctx.strokeRect(margin - 6, margin - 6, innerW + 12, innerH + 12);
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(margin - 8, margin - 8, innerW + 16, innerH + 16);
+      ctx.restore();
     }
 
-    window.onload = () => { liveRender(); };
+    // 事件監聽綁定
+    [selGround, selExit].forEach(el => {
+      el.addEventListener('change', () => applyBestPreset(false));
+    });
+
+    [selSky, selFigure].forEach(el => {
+      el.addEventListener('change', liveRender);
+    });
+
+    [rngExitX, rngExitY, rngExitScale, rngExitRot, rngGroundW, rngGroundH, rngFigX, rngFigY].forEach(slider => {
+      slider.addEventListener('input', () => {
+        updateLabels();
+        liveRender();
+      });
+    });
+
+    btnResetPair.addEventListener('click', () => applyBestPreset(false));
+
+    btnCopyCoords.addEventListener('click', () => {
+      navigator.clipboard.writeText(outputCoords.textContent).then(() => {
+        const orig = btnCopyCoords.textContent;
+        btnCopyCoords.textContent = '已複製到剪貼簿！';
+        setTimeout(() => btnCopyCoords.textContent = orig, 1500);
+      });
+    });
+
+    // 初始啟動
+    updateLabels();
+    applyBestPreset(true);
   </script>
 </body>
 </html>
