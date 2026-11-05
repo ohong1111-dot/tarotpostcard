@@ -202,7 +202,7 @@
     </div>
 
     <div class="controls-panel">
-      <!-- 元素挑選下拉選單 -->
+      <!-- 素材下拉選單（完全對齊真實檔名） -->
       <div class="selector-grid">
         <div class="control-group">
           <label>天空 (Sky)</label>
@@ -300,7 +300,7 @@
     const canvas = document.getElementById('tarotCanvas');
     const ctx = canvas.getContext('2d');
 
-    // 古典環境光染色設定（Multiply 均勻浸染）
+    // 古典環境光染色設定 (Multiply 均勻浸染)
     const SKY_TINTS = {
       'sky_gold': 'rgba(212, 175, 55, 0.08)',
       'sky_sunset': 'rgba(224, 110, 60, 0.12)',
@@ -308,7 +308,7 @@
       'sky_night': 'rgba(30, 45, 80, 0.16)'
     };
 
-    // 已驗證的最佳座標資料庫 (Ground + Exit)
+    // 已驗證的最佳座標資料庫
     const CALIBRATION_PRESETS = {
       'ground_hill+exit_bridge':    { x: 0,   y: 56,  scale: 1.00, rot: 0 },
       'ground_water+exit_stream':   { x: 200, y: 56,  scale: 1.00, rot: 0 },
@@ -324,35 +324,34 @@
 
     const imageCache = {};
 
-    function loadImage(url) {
-      if (imageCache[url]) return Promise.resolve(imageCache[url]);
+    // 支援絕對與相對路徑雙向容錯
+    function loadImage(path) {
+      if (imageCache[path]) return Promise.resolve(imageCache[path]);
       return new Promise((resolve) => {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-          imageCache[url] = img;
+          imageCache[path] = img;
           resolve(img);
         };
         img.onerror = () => {
-          // 如果帶斜線失敗，自動降級嘗試無斜線相對路徑
-          const altUrl = url.startsWith('/') ? url.slice(1) : '/' + url;
-          const altImg = new Image();
-          altImg.crossOrigin = 'anonymous';
-          altImg.onload = () => {
-            imageCache[url] = altImg;
-            resolve(altImg);
+          const fallback = path.startsWith('/') ? path.substring(1) : '/' + path;
+          const retryImg = new Image();
+          retryImg.crossOrigin = 'anonymous';
+          retryImg.onload = () => {
+            imageCache[path] = retryImg;
+            resolve(retryImg);
           };
-          altImg.onerror = () => {
-            console.warn('載入圖檔失敗:', url, '及替代路徑:', altUrl);
+          retryImg.onerror = () => {
+            console.warn('載入圖檔失敗:', path, fallback);
             resolve(null);
           };
-          altImg.src = altUrl;
+          retryImg.src = fallback;
         };
-        img.src = url;
+        img.src = path;
       });
     }
 
-    // 控制項 DOM
     const selSky = document.getElementById('selSky');
     const selGround = document.getElementById('selGround');
     const selExit = document.getElementById('selExit');
@@ -442,6 +441,8 @@
         loadImage(`/assets/figures/${figure}.png`)
       ]);
 
+      // 強制重置 Transform 矩陣並清空畫布
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#e8e0cc';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -455,7 +456,7 @@
       ctx.rect(margin, margin, innerW, innerH);
       ctx.clip();
 
-      // 1. 天空滿版鋪底
+      // 1. 天空滿版鋪底（夜空自動鏡像反轉至左側）
       if (imgSky) {
         ctx.save();
         if (sky === 'sky_night') {
@@ -468,7 +469,7 @@
         ctx.restore();
       }
 
-      // 2. 出口（退到地貌後方，由地貌遮掩其底座與生硬白邊）
+      // 2. 生路出口（先畫：退到地貌後方，起點與邊緣交由地貌遮蔽）
       if (imgExit) {
         ctx.save();
         const anchorX = margin + innerW * 0.80;
@@ -483,7 +484,7 @@
         ctx.restore();
       }
 
-      // 3. 地貌前景（覆蓋於出口之上）
+      // 3. 地貌前景（後畫：覆蓋在出口之上）
       if (imgGround) {
         ctx.save();
         const groundDrawW = innerW * gW;
@@ -502,7 +503,7 @@
         ctx.restore();
       }
 
-      // 5. 旅人立像（最前景）
+      // 5. 旅人立像（置於最前）
       if (imgFigure) {
         ctx.save();
         const figH_px = innerH * 0.38;
@@ -514,7 +515,7 @@
         ctx.restore();
       }
 
-      ctx.restore();
+      ctx.restore(); // 釋放 clip 剪裁
 
       // 6. 1909 偉特雙黑線框
       ctx.save();
